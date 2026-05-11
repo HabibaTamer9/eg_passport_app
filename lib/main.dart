@@ -1,3 +1,4 @@
+import 'package:eg_passport_app/customs/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -11,17 +12,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-        designSize: const Size(360, 840),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (_ , child) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'First Method',
-            home: Scaffold(),
-          );
-        }
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute:CustomButton.routeName ,
+      routes: {
+        CustomButton.routeName:(context)=> CustomButton( textName:"register"),
+      },
+
+
     );
   }
 }

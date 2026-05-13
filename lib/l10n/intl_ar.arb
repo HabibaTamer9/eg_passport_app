@@ -1,0 +1,27 @@
+{
+  "national_id": "الرقم القومي",
+  "national_id_required": "الرقم القومي مطلوب",
+  "national_id_length": "الرقم القومي يجب أن يتكون من 14 رقمًا",
+  "national_id_invalid": "الرقم القومي غير صحيح",
+  "national_id_exists": "هذا الرقم القومي مسجل بالفعل",
+
+  "dob": "تاريخ الميلاد",
+  "dob_required": "تاريخ الميلاد مطلوب",
+  "dob_age": "يجب أن يكون عمرك 18 عامًا على الأقل للتسجيل",
+
+  "gender": "النوع",
+  "gender_required": "النوع مطلوب",
+
+  "governorate": "المحافظة",
+  "governorate_required": "المحافظة مطلوبة",
+
+  "address": "العنوان",
+  "address_required": "العنوان مطلوب",
+  "address_min": "العنوان يجب أن يكون 10 أحرف على الأقل",
+  "address_max": "العنوان لا يجب أن يتجاوز 200 حرف",
+
+  "nationality": "الجنسية",
+  "nationality_required": "الجنسية مطلوبة",
+
+  "place_of_birth": "مكان الميلاد"
+}

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class CustomTextFormField extends StatelessWidget {
   final String title;
   final bool isRequired;
@@ -26,14 +25,9 @@ class CustomTextFormField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (isRequired)
-                const Icon(Icons.star, color: Colors.red, size: 10),
-              const SizedBox(width: 8),
               Text(
                 title,
                 style: const TextStyle(
@@ -42,6 +36,9 @@ class CustomTextFormField extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              const SizedBox(width: 8),
+              if (isRequired)
+                const Icon(Icons.star, color: Colors.red, size: 10),
             ],
           ),
           const SizedBox(height: 8),
@@ -53,11 +50,13 @@ class CustomTextFormField extends StatelessWidget {
 
             decoration: InputDecoration(
               hint: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                
                 children: [
+                   Icon(hinticon, color: Colors.grey, size: 12),
+                   SizedBox(width: 8),
                   Text(hint, style: const TextStyle(color: Colors.grey)),
-                  SizedBox(width: 8),
-                  Icon(hinticon, color: Colors.grey, size: 12),
+                 
+                 
                 ],
               ),
               contentPadding: const EdgeInsets.symmetric(

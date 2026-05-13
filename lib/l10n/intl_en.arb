@@ -1,0 +1,27 @@
+{
+  "national_id": "National ID",
+  "national_id_required": "National ID is required",
+  "national_id_length": "National ID must be exactly 14 digits",
+  "national_id_invalid": "Please enter a valid Egyptian National ID",
+  "national_id_exists": "This National ID is already registered",
+
+  "dob": "Date of Birth",
+  "dob_required": "Date of birth is required",
+  "dob_age": "You must be at least 18 years old to register",
+
+  "gender": "Gender",
+  "gender_required": "Gender is required",
+
+  "governorate": "Governorate",
+  "governorate_required": "Governorate is required",
+
+  "address": "Address",
+  "address_required": "Address is required",
+  "address_min": "Address must be at least 10 characters",
+  "address_max": "Address must not exceed 200 characters",
+
+  "nationality": "Nationality",
+  "nationality_required": "Nationality is required",
+
+  "place_of_birth": "Place of Birth"
+}

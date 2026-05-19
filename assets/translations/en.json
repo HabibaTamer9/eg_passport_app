@@ -23,5 +23,8 @@
   "nationality": "Nationality",
   "nationality_required": "Nationality is required",
 
-  "place_of_birth": "Place of Birth"
+  "place_of_birth": "Place of Birth",
+
+  "login": "Login",
+  "welcome_back": "Welcome back"
 }

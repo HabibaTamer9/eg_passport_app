@@ -23,5 +23,8 @@
   "nationality": "الجنسية",
   "nationality_required": "الجنسية مطلوبة",
 
-  "place_of_birth": "مكان الميلاد"
+  "place_of_birth": "مكان الميلاد",
+
+  "login": "تسجيل الدخول",
+  "welcome_back": "مرحبا بك من جديد",
 }

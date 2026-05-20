@@ -26,5 +26,25 @@
   "place_of_birth": "Place of Birth",
 
   "login": "Login",
-  "welcome_back": "Welcome back"
+  "welcome_back": "Welcome back",
+  "remember_me": "Remember me",
+  "email": "Email or phone number",
+  "email_required": "Email is required",
+  "email_hint": "Enter your email or phone number",
+  "password": "Password",
+  "forget_password": "Forgot password?",
+  "password_hint": "Enter your password",
+  "password_required": "Password is required",
+  "login_error": "Email or password is incorrect",
+  "don't_have_account": "Don't have an account?",
+  "register": "Register",
+  "continue": "Or continue with",
+  "fingerprint": "Fingerprint",
+  "Faceprint": "Faceprint",
+  "home": "Home",
+  "passport": "Passport",
+  "document" : "Document",
+  "notification" : "Notification",
+  "profile" : "Profile",
+  "hello": "Hello"
 }

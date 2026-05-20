@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/login_screen/login_screen.dart';
-import 'package:eg_passport_app/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,8 +11,7 @@ void main() async{
     EasyLocalization(
         supportedLocales: [Locale('en'), Locale('ar')],
         path: 'assets/translations', // <-- change the path of the translation files
-        fallbackLocale: Locale('ar',),
-        startLocale: Locale("ar"),
+        fallbackLocale: Locale('en',),
         child: MyApp()
     ),
   );
@@ -32,11 +30,10 @@ class MyApp extends StatelessWidget {
         // Use builder only if you need to use library outside ScreenUtilInit context
         builder: (_ , child) {
         return MaterialApp(
-          debugShowCheckedModeBanner: false,
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          home: MainScreen(),
+          home: LoginScreen(),
         );
       }
     );

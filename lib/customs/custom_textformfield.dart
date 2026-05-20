@@ -1,4 +1,6 @@
+import 'package:eg_passport_app/theme/app_colors.dart' show AppColors;
 import 'package:flutter/material.dart';
+
 class CustomTextFormField extends StatelessWidget {
   final String title;
   final bool isRequired;
@@ -8,6 +10,7 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool obscureText;
   final TextInputType keyboardType;
+
   const CustomTextFormField({
     super.key,
     required this.title,
@@ -23,17 +26,24 @@ class CustomTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(
+        top: 2,
+        bottom: 8,
+        left: 5,
+        right: 5,
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title
           Row(
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontStyle: Theme.of(context).textTheme.bodyMedium?.fontStyle,
+
                 ),
               ),
               const SizedBox(width: 8),
@@ -41,30 +51,79 @@ class CustomTextFormField extends StatelessWidget {
                 const Icon(Icons.star, color: Colors.red, size: 10),
             ],
           ),
+
           const SizedBox(height: 8),
+
+          // TextField
           TextFormField(
             controller: controller,
             validator: validator,
             obscureText: obscureText,
             keyboardType: keyboardType,
 
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.start,
+
             decoration: InputDecoration(
-              hint: Row(
-                
-                children: [
-                   Icon(hinticon, color: Colors.grey, size: 12),
-                   SizedBox(width: 8),
-                  Text(hint, style: const TextStyle(color: Colors.grey)),
-                 
-                 
-                ],
-              ),
+              hintText: hint,
+              hintStyle:Theme.of(context).textTheme.bodySmall,
+
+              prefixIcon: hinticon != null
+                  ? Icon(
+                hinticon,
+                color: AppColors.greyColor,
+                size: 22,
+              )
+                  : null,
+
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
+                horizontal: 10,
+                vertical: 8,
               ),
+
+              //  default state
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  width: 1.5,
+                  color: AppColors.lightGreyColor,
+                ),
+              ),
+
+              //  when focused
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  width: 1.5,
+                  color: AppColors.lightGreyColor,
+                ),
+              ),
+
+              //  when error
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  width: 1.5,
+                  color: AppColors.primaryRedColor,
+                ),
+              ),
+
+              //  when error + focus
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  width: 1.5,
+                  color: AppColors.lightGreyColor,
+                ),
+              ),
+
+              // fallback border
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  width: 2,
+                  color: AppColors.primaryRedColor,
+                ),
               ),
             ),
           ),

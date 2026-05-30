@@ -37,6 +37,9 @@ dependencies:
   dio: ^5.9.2
   flutter_screenutil: ^5.9.3
   easy_localization: ^3.0.8
+  flutter_svg: ^2.3.0
+  file_picker: ^8.3.7
+  pinput: ^6.0.2
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +63,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-   - assets/Group 1.png
+   - assets/images/
    - assets/translations/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:eg_passport_app/theme/my_theme_app.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String textName;
+  final Color? textColor;
 
   final Color? backgroundColor;
   final IconData? icon;
@@ -13,26 +14,28 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
     required this.textName,
-    this.backgroundColor,
+    this.textColor,
+    this.backgroundColor =AppColors.primaryRedColor,
     this.icon,
     this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: const EdgeInsets.only(left: 5,right: 5,top: 5),
       child: SizedBox(
         width: double.infinity,
-        height: 40,
+        height: 40.h,
         child: ElevatedButton(
           onPressed: onPressed ?? () {},
 
           style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor ?? AppColors.primaryRedColor, // default color
+            backgroundColor: backgroundColor, // default color
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
-              side: const BorderSide(color: Colors.red, width: 0.5),
+              side: const BorderSide(color: AppColors.primaryRedColor, width: 1),
             ),
           ),
 
@@ -41,7 +44,7 @@ class CustomButton extends StatelessWidget {
             children: [
               Text(
                 textName,
-                style: MyThemeApp.lightTheme.textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(color: textColor ??Colors.white),
               ),
 
               // 🔥 icon optional

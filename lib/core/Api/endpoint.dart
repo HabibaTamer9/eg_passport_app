@@ -1,0 +1,21 @@
+class Endpoint {
+ static const String baseURL = "http://10.0.2.2:5000/";
+ static const String authURL = "api/auth/";
+ static const String appURL = "/api/auth/";
+ static const String login = "login";
+ static const String register = "register";
+ static const String personalInfo = "personal-info";
+ static const String forgotPassword = "forgot-password";
+ static const String resetPassword = "reset-password";
+ static const String checkEmail = "check-email";
+ static const String checkPone = "check-mobile";
+ static const String documents = "documents";
+ static const String submit = "submit";
+ static const String status = "status";
+ static const String sendOTP = "/api/otp/send";
+ static const String verifyOTP = "/api/otp/verify";
+ static const String resendOTP = "/api/otp/verify";
+ static const String uploadDoc = "/api/uploads/document";
+ static const String getDoc = "/api/uploads";
+ static const String deleteDoc = "/api/uploads";
+}

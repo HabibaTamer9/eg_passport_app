@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eg_passport_app/home_screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../home_screen/home_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -28,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xfFFAFAFA),
       appBar: AppBar(
         toolbarHeight: 70,
         elevation: 0,
@@ -65,14 +67,15 @@ class _MainScreenState extends State<MainScreen> {
         actions: [
           Container(
             height: 60,
-              width: 40,
-              child: Image.asset("assets/egy.png", fit: BoxFit.fill)),
+              width: 45,
+              child: Image.asset("assets/images/egy.png", fit: BoxFit.fill)),
           SizedBox(width: 10.w),
         ],
 
       ),
       body: pages[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
         currentIndex: selectedIndex,
         onTap: (index){
           selectedIndex = index;

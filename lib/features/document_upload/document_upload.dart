@@ -1,8 +1,10 @@
 import 'dart:async';
-
-import 'package:eg_passport_app/document_upload/document_file_picker_service.dart';
-import 'package:eg_passport_app/document_upload/document_upload_models.dart';
+import 'package:eg_passport_app/features/login_screen/widgets/background.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'document_file_picker_service.dart';
+import 'document_upload_models.dart';
 
 
 class DocumentUploadScreen extends StatefulWidget {
@@ -275,17 +277,18 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
   }
 
   Widget _buildMobileLayout() {
-    return Column(
-      children: [
-        _buildTopBar(compact: true),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
-            child: _buildMainContent(isWide: false),
+    return Background(
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+              child: _buildMainContent(isWide: false),
+            ),
           ),
-        ),
-        _buildBottomActions(isWide: false),
-      ],
+          _buildBottomActions(isWide: false),
+        ],
+      ),
     );
   }
 
@@ -595,7 +598,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _ink,
-            fontSize: isWide ? 25 : 19,
+            fontSize: isWide ? 25.sp : 19.sp,
             fontWeight: FontWeight.w900,
             height: 1.25,
           ),
@@ -606,12 +609,12 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _mutedText,
-            fontSize: isWide ? 14 : 12,
+            fontSize: isWide ? 14.sp : 12.sp,
             height: 1.5,
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: isWide ? 24 : 16),
+        SizedBox(height: isWide ? 24.h : 16.h),
         _buildStepIndicator(isWide: isWide),
         SizedBox(height: isWide ? 24 : 16),
         if (isWide) ...[_buildDropZone(), const SizedBox(height: 24)],

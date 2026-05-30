@@ -1,5 +1,6 @@
-import 'package:eg_passport_app/theme/app_colors.dart' show AppColors;
 import 'package:flutter/material.dart';
+
+import '../theme/app_colors.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final String title;
@@ -10,6 +11,9 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool obscureText;
   final TextInputType keyboardType;
+  final IconData? suffixIcon;
+  final int? maxLength;
+  final VoidCallback? onTap;
 
   const CustomTextFormField({
     super.key,
@@ -21,6 +25,9 @@ class CustomTextFormField extends StatelessWidget {
     this.validator,
     this.obscureText = false,
     required this.keyboardType,
+    this.suffixIcon,
+    this.maxLength,
+    this.onTap,
   });
 
   @override
@@ -63,8 +70,18 @@ class CustomTextFormField extends StatelessWidget {
 
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.start,
+            maxLength: maxLength,
+            onTap: onTap,
 
             decoration: InputDecoration(
+
+              suffixIcon: suffixIcon != null
+                  ? Icon(
+                suffixIcon,
+                color: AppColors.greyColor,
+                size: 22,
+              )
+                  : null,
               hintText: hint,
               hintStyle:Theme.of(context).textTheme.bodySmall,
 

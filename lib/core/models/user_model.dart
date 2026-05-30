@@ -1,25 +1,27 @@
 class UserModel {
+  final String uID;
   final String name;
   final String email;
   final int phoneNumber;
-  final int nationalID;
-  final String grand;
-  final String dateOfBirth;
-  final String city;
-  final String address;
-  final String birthCity;
-  final String nationality;
+  int? nationalID;
+  String? gender;
+  String? dateOfBirth;
+  String? city;
+  String? address;
+  String? birthCity;
+  String? nationality;
 
   UserModel({
+    required this.uID,
     required this.name,
     required this.email,
     required this.phoneNumber,
-    required this.nationalID,
-    required this.grand,
-    required this.dateOfBirth,
-    required this.city,
-    required this.address,
-    required this.birthCity,
-    required this.nationality,
+    this.nationalID,
+    this.gender,
+    this.dateOfBirth,
+    this.city,
+    this.address,
+    this.birthCity,
+    this.nationality,
   });
 }

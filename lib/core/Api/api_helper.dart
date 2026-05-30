@@ -4,16 +4,14 @@ import 'package:eg_passport_app/core/Api/endpoint.dart';
 class ApiHelper {
   static String? accessToken;
   static String? refreshToken;
+  static String messageLanguage = 'messageAr';
 
   final Dio dio = Dio(
     BaseOptions(
       baseUrl: Endpoint.baseURL,
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 20),
-      headers: const {
-        'Accept': 'application/json',
-        'Accept-Language': 'ar',
-      },
+      headers: const {'Accept': 'application/json', 'Accept-Language': 'ar'},
     ),
   );
 
@@ -124,5 +122,4 @@ class ApiHelper {
       'errors': [],
     };
   }
-
 }

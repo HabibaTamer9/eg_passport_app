@@ -1,10 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eg_passport_app/features/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/theme/my_theme_app.dart';
-import 'features/login_screen/login_screen.dart';
+import 'features/auth/login_screen/login_screen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();

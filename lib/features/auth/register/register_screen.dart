@@ -1,15 +1,17 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/core/Api/api_helper.dart';
 import 'package:eg_passport_app/core/Api/endpoint.dart';
-import 'package:eg_passport_app/features/login_screen/widgets/background.dart';
-import 'package:eg_passport_app/features/personal_info_screen/personal_info_ui.dart';
+import 'package:eg_passport_app/core/data/app_data.dart';
+import '../../../core/models/user_model.dart';
+import '../login_screen/widgets/background.dart';
+import '../personal_info_screen/personal_info_ui.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../core/customs/custom_button.dart';
-import '../../core/customs/custom_textformfield.dart';
+import '../../../core/customs/custom_button.dart';
+import '../../../core/customs/custom_textformfield.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../document_upload/document_upload.dart';
+import '../../../core/theme/app_colors.dart';
 import '../login_screen/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -25,18 +27,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
-  final nationalIdController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
   bool isChecked = false;
+  String messageLanguage = ApiHelper.messageLanguage;
+  String uId = "";
 
   @override
   void dispose() {
     nameController.dispose();
-    nationalIdController.dispose();
     emailController.dispose();
     phoneController.dispose();
     passwordController.dispose();
@@ -44,83 +46,110 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void register() async{
+  String _apiMessage(Map<String, dynamic> response) {
+    final errors = response["errors"];
+    if (errors.isNotEmpty) {
+      return errors.first[messageLanguage] ?? "حدث خطأ في البيانات";
+    }
+
+    return response[messageLanguage] ?? "حدث خطأ غير متوقع";
+  }
+
+  void _saveAuthTokens(Map<String, dynamic> response) {
+    final data = response["data"];
+    if (data is Map) {
+      ApiHelper.accessToken = data["accessToken"]?.toString();
+      ApiHelper.refreshToken = data["refreshToken"]?.toString();
+    }
+  }
+
+  Future<void> _showApiDialog({
+    required String title,
+    required String message,
+  }) async {
+    if (!mounted) return;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          CustomButton(textName: "OK", onPressed: () => Navigator.pop(context)),
+        ],
+      ),
+    );
+  }
+
+  void getUser(var response) {
+    AppData.user = UserModel(
+      uID: response["data"]["userId"],
+      name: response["data"]["fullName"],
+      email: response["data"]["email"],
+      phoneNumber: response["data"]["mobileNumber"],
+    );
+  }
+
+  void register() async {
     try {
       showDialog(
         barrierDismissible: false,
-          context: context, builder: (context) =>Center(
-        child: CircularProgressIndicator(),
-      ));
+        context: context,
+        builder: (context) => Center(child: CircularProgressIndicator()),
+      );
       var response = await ApiHelper().postAuthAPI(Endpoint.register, {
-        "fullName": nameController.text,
-        "email": emailController.text,
-        "mobileNumber": phoneController.text,
-        "password": passwordController.text,
-        "confirmPassword": confirmPasswordController.text,
-        "termsAccepted": isChecked
+        "fullName": nameController.text.trim(),
+        "email": emailController.text.trim(),
+        "mobileNumber": phoneController.text.trim(),
+        "password": passwordController.text.trim(),
+        "confirmPassword": confirmPasswordController.text.trim(),
+        "termsAccepted": isChecked,
       });
-      print(response["success"]);
-      if (!response["success"]) {
-        var errors = response["errors"];
-        if(errors.isNotEmpty) {
-          showDialog(context: context, builder: (context) =>
-              AlertDialog(
-                title: Text("خطأ"),
-                content: Text(errors[0]["messageAr"]),
-                actions: [
-                  CustomButton(textName: "OK", onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },)
-                ],
-              ));
-        }else {
-          showDialog(context: context, builder: (context) =>
-              AlertDialog(
-                title: Text("خطأ"),
-                content: Text(response["messageAr"]),
-                actions: [
-                  CustomButton(textName: "OK", onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },)
-                ],
-              ));
-        }
-      }else{
-        showDialog(context: context, builder: (context) =>
-            AlertDialog(
-              title: Text("تم"),
-              content: Text("${response}"),
-              actions: [
-                CustomButton(textName: "OK", onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },)
-              ],
-            ));
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PersonalInfoScreen(),
-          ),
-        );
-      }
-    }catch (e){
-      print("e:  $e");
-      showDialog(context: context, builder: (context) =>
-          AlertDialog(
-            title: Center(child: Text("حدث خطأ ما من فضلك حاول مره اخرى لاحقا",textAlign: TextAlign.center,)),
-            actions: [
-              CustomButton(textName: "OK", onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },)
-            ],
-          ));
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
 
+      if (response["success"] != true) {
+        await _showApiDialog(title: 'error'.tr(), message: _apiMessage(response));
+        return;
+      }
+
+      _saveAuthTokens(response);
+      await _showApiDialog(
+        title: "تم",
+        message: response[messageLanguage] ?? "تم إنشاء الحساب بنجاح",
+      );
+      uId = response["data"]["userId"];
+      getUser(response);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PersonalInfoScreen()),
+      );
+      return;
+    } catch (e) {
+      print("e:  $e");
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Center(
+            child: Text(
+              'errorMessage'.tr(),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: [
+            CustomButton(
+              textName: "OK",
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
     }
-    
   }
 
   @override
@@ -223,8 +252,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (value == null || value.isEmpty) {
                             return " من فضلك ادخل كلمة المرور";
                           }
-                          if (value.length < 6) {
-                            return "لكلمة المرور يجب أن تكون 6 أحرف على الأقل";
+                          if (value.length < 8) {
+                            return "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+                          }
+                          if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                            return "كلمة المرور يجب أن تحتوي على حرف كبير";
+                          }
+                          if (!RegExp(r'[0-9]').hasMatch(value)) {
+                            return "كلمة المرور يجب أن تحتوي على رقم";
+                          }
+                          if (!RegExp(r'[^A-Za-z0-9]').hasMatch(value)) {
+                            return "كلمة المرور يجب أن تحتوي على رمز خاص مثل @";
                           }
                           return null;
                         },
@@ -317,9 +355,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         if (!isChecked) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                "يجب الموافقة على الشروط والأحكام",
-                              ),
+                              content: Text("يجب الموافقة على الشروط والأحكام"),
                             ),
                           );
                           return;

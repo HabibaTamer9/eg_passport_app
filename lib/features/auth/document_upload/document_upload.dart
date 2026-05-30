@@ -1,11 +1,16 @@
 import 'dart:async';
-import 'package:eg_passport_app/features/login_screen/widgets/background.dart';
+import '../../../core/Api/api_helper.dart';
+import '../../../core/Api/endpoint.dart';
+import '../../../core/customs/custom_button.dart';
+import '../../../core/data/app_data.dart';
+import '../../../core/models/user_model.dart';
+import '../../main_screen/main_screen.dart';
+import '../login_screen/widgets/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'document_file_picker_service.dart';
 import 'document_upload_models.dart';
-
 
 class DocumentUploadScreen extends StatefulWidget {
   const DocumentUploadScreen({super.key});
@@ -29,6 +34,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
 
   static const String _securityText =
       'جميع ملفاتك محمية ومشفرة: نضمن سرية وأمان بياناتك وفقاً لأعلى معايير الأمن';
+
   /// Progress milestones shown while [_simulateNetworkUpload] runs.
   static const List<int> _uploadProgressSteps = [40, 70, 100];
 
@@ -133,7 +139,10 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       completer.complete();
     }
 
-    _uploadTimers[field] = Timer(const Duration(milliseconds: 300), scheduleNextStep);
+    _uploadTimers[field] = Timer(
+      const Duration(milliseconds: 300),
+      scheduleNextStep,
+    );
     return completer.future;
   }
 
@@ -214,7 +223,11 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
                 child: const Text('إلغاء', style: TextStyle(color: _mutedText)),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+
+                  Navigator.of(context).pop();
+
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _crimsonRed,
                   foregroundColor: Colors.white,
@@ -230,6 +243,75 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
         );
       },
     );
+  }
+  String messageLanguage = ApiHelper.messageLanguage;
+  String _apiMessage(Map<String, dynamic> response) {
+    final errors = response["errors"];
+    if (errors.isNotEmpty) {
+      return errors.first[messageLanguage] ?? "حدث خطأ في البيانات";
+    }
+
+    return response[messageLanguage] ?? "حدث خطأ غير متوقع";
+  }
+
+  void _saveAuthTokens(Map<String, dynamic> response) {
+    final data = response["data"];
+    if (data is Map) {
+      ApiHelper.accessToken = data["accessToken"]?.toString();
+      ApiHelper.refreshToken = data["refreshToken"]?.toString();
+    }
+  }
+
+  Future<void> _showApiDialog({required String title, required String message,}) async {
+    if (!mounted) return;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          CustomButton(
+            textName: "OK",
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> documentUpload()async {
+    try {
+      var response = await ApiHelper().postAPI(Endpoint.uploadDoc, {});
+
+      if (response["success"] != true) {
+        await _showApiDialog(title: "خطأ", message: _apiMessage(response));
+        return;
+      }
+
+      _saveAuthTokens(response);
+      await _showApiDialog(
+        title: "تم",
+        message: response["messageAr"] ?? "تم تسجيل الدخول بنجاح",
+      );
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
+      return;
+    }catch (e){
+      showDialog(context: context, builder: (context) =>
+          AlertDialog(
+            title: Center(child: Text("حدث خطأ ما من فضلك حاول مره اخرى لاحقا",textAlign: TextAlign.center,)),
+            actions: [
+              CustomButton(textName: "OK", onPressed: () {
+                Navigator.pop(context);
+              },)
+            ],
+          ));
+    }
   }
 
   @override
@@ -1467,11 +1549,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.workspace_premium,
-            color: _goldAccent,
-            size: 28,
-          ),
+          const Icon(Icons.workspace_premium, color: _goldAccent, size: 28),
           if (state.hasSelectedFile) ...[
             const SizedBox(height: 4),
             _previewFileName(state.fileName!),

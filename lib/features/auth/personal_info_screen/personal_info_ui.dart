@@ -1,17 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/core/customs/custom_button.dart';
+import 'package:eg_passport_app/core/data/app_data.dart';
 import 'package:eg_passport_app/core/theme/app_colors.dart';
-import 'package:eg_passport_app/features/document_upload/document_upload.dart';
-import 'package:eg_passport_app/features/login_screen/widgets/background.dart';
-import 'package:eg_passport_app/features/personal_info_screen/data/personal_list.dart';
+import '../document_upload/document_upload.dart';
+import '../login_screen/widgets/background.dart';
+import 'data/personal_list.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../core/Api/api_helper.dart';
-import '../../core/Api/endpoint.dart';
-import '../../core/customs/custom_dropdown.dart';
-import '../../core/customs/custom_textformfield.dart';
+import '../../../core/Api/api_helper.dart';
+import '../../../core/Api/endpoint.dart';
+import '../../../core/customs/custom_dropdown.dart';
+import '../../../core/customs/custom_textformfield.dart';
 import 'app_validator.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
@@ -30,85 +31,130 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   final TextEditingController addressController = TextEditingController();
   String? selectedGender;
   String? selectedGovernorate;
+  String? selectedPlaceOfBirth;
   String? selectedNationality;
 
-  void personalInfo() async{
-    try {
-      showDialog(
-          barrierDismissible: false,
-          context: context, builder: (context) =>Center(
-        child: CircularProgressIndicator(),
-      ));
-      var response = await ApiHelper().postAuthAPI(Endpoint.register, {
-        "nationalId": nationalIdController.text,
-        "governorate": governorateController.text,
-        "address": addressController.text,
-        "nationality": selectedNationality,
-        "placeOfBirth": birthDateController.text,
-        "profilePhotoUrl": "string"
-      });
-      print(response["success"]);
-      if (!response["success"]) {
-        var errors = response["errors"];
-        if(errors.isNotEmpty) {
-          showDialog(context: context, builder: (context) =>
-              AlertDialog(
-                title: Text("خطأ"),
-                content: Text(errors[0]["messageAr"]),
-                actions: [
-                  CustomButton(textName: "OK", onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },)
-                ],
-              ));
-        }else {
-          showDialog(context: context, builder: (context) =>
-              AlertDialog(
-                title: Text("خطأ"),
-                content: Text(response["messageAr"]),
-                actions: [
-                  CustomButton(textName: "OK", onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },)
-                ],
-              ));
-        }
-      }else{
-        showDialog(context: context, builder: (context) =>
-            AlertDialog(
-              title: Text("تم"),
-              content: Text("${response}"),
-              actions: [
-                CustomButton(textName: "OK", onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },)
-              ],
-            ));
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PersonalInfoScreen(),
-          ),
-        );
-      }
-    }catch (e){
-      print("e:  $e");
-      showDialog(context: context, builder: (context) =>
-          AlertDialog(
-            title: Center(child: Text("حدث خطأ ما من فضلك حاول مره اخرى لاحقا",textAlign: TextAlign.center,)),
-            actions: [
-              CustomButton(textName: "OK", onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },)
-            ],
-          ));
-
+  String _apiMessage(Map<String, dynamic> response) {
+    final errors = response["errors"];
+    if (errors is List && errors.isNotEmpty && errors.first is Map) {
+      final firstError = Map<String, dynamic>.from(errors.first as Map);
+      return firstError["messageAr"] ??
+          firstError["messageEn"] ??
+          firstError["message"] ??
+          "حدث خطأ في البيانات";
     }
 
+    return response["messageAr"] ??
+        response["messageEn"] ??
+        response["message"] ??
+        "حدث خطأ غير متوقع";
+  }
+
+  Future<void> _showApiDialog({
+    required String title,
+    required String message,
+  }) async {
+    if (!mounted) return;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          CustomButton(textName: "OK", onPressed: () => Navigator.pop(context)),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    nationalIdController.dispose();
+    birthDateController.dispose();
+    genderController.dispose();
+    governorateController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  void getUser(response) {
+    AppData.user.nationalID = nationalIdController.text.trim() as int?;
+    AppData.user.gender = selectedGender;
+    AppData.user.dateOfBirth = birthDateController.text.trim();
+    AppData.user.city = selectedGovernorate;
+    AppData.user.address = addressController.text.trim();
+    AppData.user.birthCity = selectedPlaceOfBirth;
+    AppData.user.nationality = selectedNationality;
+  }
+
+  void personalInfo() async {
+    try {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => Center(child: CircularProgressIndicator()),
+      );
+      var response = await ApiHelper().putAPI(
+        "${Endpoint.appURL}${AppData.user.uID}/${Endpoint.personalInfo}",
+        {
+          "nationalId": nationalIdController.text.trim(),
+          "governorate":
+              selectedGovernorate ?? governorateController.text.trim(),
+          "address": addressController.text.trim(),
+          "nationality": selectedNationality,
+          "placeOfBirth": selectedPlaceOfBirth,
+          "profilePhotoUrl": null,
+        },
+      );
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (response["success"] != true) {
+        await _showApiDialog(title: 'error'.tr(), message: _apiMessage(response));
+        return;
+      }
+
+      await _showApiDialog(
+        title: "تم",
+        message: response["messageAr"] ?? "تم حفظ البيانات بنجاح",
+      );
+      getUser(response);
+      print("response: $response");
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DocumentUploadScreen()),
+      );
+      return;
+    } catch (e) {
+      print("e:  $e");
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Center(
+            child: Text(
+              'errorMessage'.tr(),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: [
+            CustomButton(
+              textName: "OK",
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -397,7 +443,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
                             hint: "place_of_birth".tr(),
                             hinticon: Icons.location_on,
-                            value: selectedGovernorate,
+                            value: selectedPlaceOfBirth,
 
                             validator: (value) {
                               return AppValidators.validateGovernorate(
@@ -408,7 +454,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
                             onChanged: (String? value) {
                               setState(() {
-                                selectedGovernorate = value;
+                                selectedPlaceOfBirth = value;
                               });
                             },
                           ),
@@ -427,15 +473,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             textName: 'next'.tr(),
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DocumentUploadScreen(),
-                                  ),
-                                );
+                                personalInfo();
                               }
-                            }
+                            },
                           ),
                         ),
                         Expanded(

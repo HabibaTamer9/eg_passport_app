@@ -3,13 +3,15 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/core/Api/api_helper.dart';
 import 'package:eg_passport_app/core/Api/endpoint.dart';
-import 'package:eg_passport_app/features/login_screen/widgets/background.dart';
+import '../../../core/data/app_data.dart';
+import '../../../core/models/user_model.dart';
+import 'widgets/background.dart';
 import 'package:eg_passport_app/features/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../core/customs/custom_button.dart';
-import '../../core/customs/custom_textformfield.dart';
+import '../../../core/customs/custom_button.dart';
+import '../../../core/customs/custom_textformfield.dart';
 import '../register/register_screen.dart';
 import 'forgot_password.dart';
 
@@ -25,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isRemember = false;
+  String messageLanguage = ApiHelper.messageLanguage;
 
   @override
   void dispose() {
@@ -33,49 +36,82 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  String _apiMessage(Map<String, dynamic> response) {
+    final errors = response["errors"];
+    if (errors.isNotEmpty) {
+      return errors.first[messageLanguage] ?? "حدث خطأ في البيانات";
+    }
+
+    return response[messageLanguage] ?? "حدث خطأ غير متوقع";
+  }
+
+  void _saveAuthTokens(Map<String, dynamic> response) {
+    final data = response["data"];
+    if (data is Map) {
+      ApiHelper.accessToken = data["accessToken"]?.toString();
+      ApiHelper.refreshToken = data["refreshToken"]?.toString();
+    }
+  }
+
+  Future<void> _showApiDialog({
+    required String title,
+    required String message,
+  }) async {
+    if (!mounted) return;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          CustomButton(
+            textName: "OK",
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ),
+    );
+  }
+
+  void getUser(var response) {
+    AppData.user = UserModel(
+      uID: response["data"]["userId"],
+      name: response["data"]["fullName"],
+      email: response["data"]["email"],
+      phoneNumber: response["data"]["mobileNumber"],
+    );
+  }
+
   Future<void> login()async {
     try {
       var response = await ApiHelper().postAuthAPI(Endpoint.login, {
-        "emailOrMobile": emailController.text,
-        "password": passwordController.text
+        "emailOrMobile": emailController.text.trim(),
+        "password": passwordController.text.trim()
       });
-      String message = "";
-      print(response);
-      if (!response["success"]) {
-        var errors = response["errors"];
-        if (errors.isNotEmpty) {
-          message = errors[0]["messageAr"];
-        } else {
-          message = response["messageAr"];
-        }
-        showDialog(context: context, builder: (context) =>
-            AlertDialog(
-              title: Text("خطأ"),
-              content: Text(message),
-              actions: [
-                CustomButton(textName: "OK", onPressed: () {
-                  Navigator.pop(context);
-                },)
-              ],
-            ));
-      } else {
-        showDialog(context: context, builder: (context) =>
-            AlertDialog(
-              title: Text("تم"),
-              content: Text("${response}"),
-              actions: [
-                CustomButton(textName: "OK", onPressed: () {
-                  Navigator.pop(context);
-                },)
-              ],
-            ));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> MainScreen()));
 
+      if (response["success"] != true) {
+        await _showApiDialog(title: 'error'.tr(), message: _apiMessage(response));
+        return;
       }
+
+      _saveAuthTokens(response);
+      await _showApiDialog(
+        title: "تم",
+        message: response[messageLanguage] ?? "تم تسجيل الدخول بنجاح",
+      );
+      getUser(response);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
+      return;
     }catch (e){
       showDialog(context: context, builder: (context) =>
           AlertDialog(
-            title: Center(child: Text("حدث خطأ ما من فضلك حاول مره اخرى لاحقا",textAlign: TextAlign.center,)),
+            title: Center(child: Text('errorMessage'.tr(),textAlign: TextAlign.center,)),
             actions: [
               CustomButton(textName: "OK", onPressed: () {
                 Navigator.pop(context);

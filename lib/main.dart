@@ -1,9 +1,17 @@
+<<<<<<< HEAD
+import 'package:easy_localization/easy_localization.dart';
+//import 'package:eg_passport_app/login_screen/login_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eg_passport_app/document_upload.dart';
+=======
 import 'package:easy_localization/easy_localization.dart' show EasyLocalization, BuildContextEasyLocalizationExtension;
 import 'package:eg_passport_app/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'register/register_screen.dart';
 import 'theme/my_theme_app.dart';
+>>>>>>> 780527c47407ca49dedaeccb8ae77f6069744d8f
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +48,9 @@ class MyApp extends StatelessWidget {
 
           // 🔥 localization
           locale: context.locale,
+<<<<<<< HEAD
+          home: const DocumentUploadScreen(),
+=======
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
 
@@ -58,6 +69,7 @@ class MyApp extends StatelessWidget {
               RegisterScreen.routeName: (context) => const RegisterScreen(),
              Loginscreen.routeName: (context) => const Loginscreen(),
             }
+>>>>>>> 780527c47407ca49dedaeccb8ae77f6069744d8f
         );
       },
     );

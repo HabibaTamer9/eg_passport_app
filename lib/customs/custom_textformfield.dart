@@ -10,6 +10,8 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool obscureText;
   final TextInputType keyboardType;
+  final int? maxLength;
+  final VoidCallback? onTap;
 
   const CustomTextFormField({
     super.key,
@@ -21,18 +23,13 @@ class CustomTextFormField extends StatelessWidget {
     this.validator,
     this.obscureText = false,
     required this.keyboardType,
+    this.maxLength,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 2,
-        bottom: 8,
-        left: 5,
-        right: 5,
-      ),
-      child: Column(
+    return  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title
@@ -60,11 +57,14 @@ class CustomTextFormField extends StatelessWidget {
             validator: validator,
             obscureText: obscureText,
             keyboardType: keyboardType,
-
+           maxLength: maxLength,
+          onTap: onTap,
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.start,
 
             decoration: InputDecoration(
+              filled: true,
+            fillColor: Color(0xffF9FAFB),
               hintText: hint,
               hintStyle:Theme.of(context).textTheme.bodySmall,
 
@@ -128,7 +128,7 @@ class CustomTextFormField extends StatelessWidget {
             ),
           ),
         ],
-      ),
+     
     );
   }
 }

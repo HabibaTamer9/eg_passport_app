@@ -8,7 +8,7 @@ class MyThemeApp {
     textTheme: TextTheme(
       //textLarge
       titleLarge: TextStyle(
-          fontSize: 18,
+          fontSize: 22,
         color: AppColors.blackColor,
         fontFamily: "Cairo",
         fontWeight: FontWeight.w700,

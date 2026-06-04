@@ -1,6 +1,6 @@
 import 'package:file_picker/file_picker.dart';
-
 import 'document_upload_models.dart';
+import 'package:flutter/material.dart';
 
 /// Thrown when the user picks a file that fails client-side EGY-103 rules.
 class DocumentPickValidationException implements Exception {
@@ -30,7 +30,7 @@ class DocumentFilePickerService {
     final config = DocumentSlotConfig.forField(field);
     if (config == null) return null;
 
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: config.allowedExtensions,
       allowMultiple: false,

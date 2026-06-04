@@ -65,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
         centerTitle: true,
         leading: Icon(Icons.menu, color: Color(0xff44474E), size: 30.sp),
         actions: [
-          Container(
+          SizedBox(
             height: 60,
               width: 45,
               child: Image.asset("assets/images/egy.png", fit: BoxFit.fill)),

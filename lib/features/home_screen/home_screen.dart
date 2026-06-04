@@ -1,14 +1,34 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eg_passport_app/core/data/app_data.dart';
 import 'package:eg_passport_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  int currentIndex = 1;
+
+  final List<String> state = [
+    "تم استلام الطلب",
+    "جاري التحقق",
+    "تمت الموافقة",
+    "تم الاصدار",
+  ];
+
+  Color getColor(int index) {
+    if (index == currentIndex) {
+      return Color(0xffC09300);
+    }
+    if (index < currentIndex) {
+      return Color(0xff16A34A);
+    }
+    return Colors.grey;
+  }
 
   @override
   Widget build(BuildContext context) {
+    print(AppData.user.profileImage);
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(10.0.sp),
@@ -20,7 +40,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: AssetImage("assets/images/egy.png"),
+                  backgroundImage: NetworkImage(AppData.user.profileImage!),
                 ),
                 SizedBox(width: 10.w),
                 Column(
@@ -35,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "احمد محمد علي",
+                      AppData.user.name,
                       style: TextStyle(
                         color: Color(0xff44474E),
                         fontSize: 20.sp,
@@ -78,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                             child: Image.asset("assets/images/SVG.png"),
                           ),
                           SizedBox(width: 8.w),
-      
+
                           Column(
                             children: [
                               Text(
@@ -142,7 +162,7 @@ class HomeScreen extends StatelessWidget {
                           border: Border.all(color: Color(0xff44474E)),
                           borderRadius: BorderRadius.circular(12.r),
                           image: DecorationImage(
-                            image: AssetImage("assets/images/egy.png"),
+                            image: NetworkImage(AppData.user.profileImage!),
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -152,7 +172,7 @@ class HomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "احمد محمد علي",
+                            AppData.user.name,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18.sp,
@@ -185,7 +205,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "EP-2025-0005847",
+                            AppData.user.appNumber!,
                             style: TextStyle(
                               color: Color(0xffC09300),
                               fontSize: 15.sp,
@@ -206,20 +226,20 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 25.h,),
-                  Divider(
-                    thickness: 1,
-                    color: AppColors.greyColor,
-                  ),
+                  SizedBox(height: 25.h),
+                  Divider(thickness: 1, color: AppColors.greyColor),
                   SizedBox(height: 15.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("سينتهي خلال 2:25",style: TextStyle(
-                        color: AppColors.greyColor,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                      )),
+                      Text(
+                        "سينتهي خلال 2:25",
+                        style: TextStyle(
+                          color: AppColors.greyColor,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white30,
@@ -227,32 +247,40 @@ class HomeScreen extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.refresh, color: Colors.white,),
-                            Text("تحديث رمز QR",style: TextStyle(
-                              color: AppColors.whiteColor,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                            )),
+                            Icon(Icons.refresh, color: Colors.white),
+                            Text(
+                              "تحديث رمز QR",
+                              style: TextStyle(
+                                color: AppColors.whiteColor,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
             Container(
-              margin: EdgeInsetsGeometry.symmetric(vertical: 10.h,horizontal: 5.w),
-              padding: EdgeInsetsGeometry.symmetric(vertical: 10.h,),
+              margin: EdgeInsetsGeometry.symmetric(
+                vertical: 10.h,
+                horizontal: 5.w,
+              ),
+              padding: EdgeInsetsGeometry.symmetric(vertical: 10.h),
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
                 borderRadius: BorderRadius.circular(16.r),
-                boxShadow:[ BoxShadow(
-                  color: AppColors.lightGreyColor,
-                  blurRadius: 10,
-                  blurStyle: BlurStyle.outer,
-                  spreadRadius: 1
-                )]
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.lightGreyColor,
+                    blurRadius: 10,
+                    blurStyle: BlurStyle.outer,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
               width: 360.w,
               height: 155.h,
@@ -267,117 +295,63 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(8.sp),
-                            width: 25.w,
-                            height: 25.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xff16A34A),
+                  SizedBox(
+                    height: 100.h,
+                    width: 300.w,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 4,
+                      itemBuilder: (context, index) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.all(8.sp),
+                                  width: 25.w,
+                                  height: 25.h,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: getColor(index),
+                                  ),
+                                  child: Icon(
+                                    Icons.check,
+                                    color: AppColors.whiteColor,
+                                    size: 15.sp,
+                                  ),
+                                ),
+                                Text(
+                                  state[index],
+                                  style: TextStyle(
+                                    color: getColor(index),
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: Icon(Icons.check,color: AppColors.whiteColor,size: 15.sp,),
-                          ),
-                          Text(
-                            "تم استلام الطلب",
-                            style: TextStyle(
-                              color: Color(0xff16A34A),
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 1,
-                        color: Color(0xff16A34A),
-                        indent: 8,
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(8.sp),
-                            width: 25.w,
-                            height: 25.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xffC09300),
-                            ),
-                            child: Icon(Icons.access_time_outlined,color: AppColors.whiteColor,size: 15.sp,),
-                          ),
-                          Text(
-                            "جاري التحقق",
-                            style: TextStyle(
-                              color: Color(0xffC09300),
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 1,
-                        color: Color(0xffC09300),
-                        endIndent: 8,
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(8.sp),
-                            width: 25.w,
-                            height: 25.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.greyColor,
-                            ),
-                            child: Icon(Icons.check,color: AppColors.whiteColor,size: 15.sp,),
-                          ),
-                          Text(
-                            "تمت الموافقة",
-                            style: TextStyle(
-                              color: Color(0xff44474E),
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 1,
-                        color: AppColors.greyColor,
-                        indent: 8,
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(8.sp),
-                            width: 25.w,
-                            height: 25.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.greyColor,
-                            ),
-                            child: Icon(Icons.credit_card,color: AppColors.whiteColor,size: 15.sp,),
-                          ),
-                          Text(
-                            "تم الاصدار",
-                            style: TextStyle(
-                              color: Color(0xff44474E),
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
+                            if (index != 3)
+                              Container(
+                                width: 28.w,
+                                height: 2,
+                                color: getColor(index),
+                                margin: EdgeInsets.only(
+                                  bottom: 55.h,
+                                  left: 5.w,
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
+
             Text(
               "اجراءات سريعه",
               style: TextStyle(
@@ -396,11 +370,11 @@ class HomeScreen extends StatelessWidget {
                       height: 55.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r)
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Icon(Icons.qr_code,size: 25.sp,),
+                      child: Icon(Icons.qr_code, size: 25.sp),
                     ),
-                    SizedBox(height: 8.h,),
+                    SizedBox(height: 8.h),
                     Text(
                       "QR",
                       style: TextStyle(
@@ -410,18 +384,22 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),Column(
+                ),
+                Column(
                   children: [
                     Container(
                       width: 55.w,
                       height: 55.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r)
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Icon(Icons.insert_drive_file_outlined,size: 25.sp,),
+                      child: Icon(
+                        Icons.insert_drive_file_outlined,
+                        size: 25.sp,
+                      ),
                     ),
-                    SizedBox(height: 8.h,),
+                    SizedBox(height: 8.h),
                     Text(
                       "التفاصيل",
                       style: TextStyle(
@@ -431,18 +409,19 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),Column(
+                ),
+                Column(
                   children: [
                     Container(
                       width: 55.w,
                       height: 55.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r)
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Icon(Icons.download,size: 25.sp,),
+                      child: Icon(Icons.download, size: 25.sp),
                     ),
-                    SizedBox(height: 8.h,),
+                    SizedBox(height: 8.h),
                     Text(
                       "تحميل pdf",
                       style: TextStyle(
@@ -452,18 +431,19 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),Column(
+                ),
+                Column(
                   children: [
                     Container(
                       width: 55.w,
                       height: 55.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r)
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Icon(Icons.help,size: 25.sp,),
+                      child: Icon(Icons.help, size: 25.sp),
                     ),
-                    SizedBox(height: 8.h,),
+                    SizedBox(height: 8.h),
                     Text(
                       "مساعده",
                       style: TextStyle(
@@ -475,7 +455,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

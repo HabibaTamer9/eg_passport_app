@@ -42,6 +42,26 @@ class ApiHelper {
     }
   }
 
+  Future<Map<String, dynamic>> docPostAPI(
+      String endpoint,
+      dynamic body, {
+        String? token,
+      }) async {
+    try {
+      final response = await dio.post(
+        endpoint,
+        data: body,
+        options: _options(token),
+      );
+
+      return _toMap(response.data);
+    } on DioException catch (e) {
+      return _handleDioException(e);
+    } catch (e) {
+      return _clientError('CLIENT_ERROR', e.toString());
+    }
+  }
+
   Future<Map<String, dynamic>> putAPI(
       String endpoint,
       Map<String, dynamic> body, {

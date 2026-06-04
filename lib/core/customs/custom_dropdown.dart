@@ -1,6 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_colors.dart';
 
@@ -11,7 +9,7 @@ class CustomDropDown extends StatelessWidget {
   final IconData? hinticon;
   final String? value;
   final String? Function(String?)? validator;
-  CustomDropDown({
+  const CustomDropDown({
     super.key,
     required this.items,
     this.onChanged,

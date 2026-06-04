@@ -34,7 +34,7 @@ class DocumentFilePickerService {
       type: FileType.custom,
       allowedExtensions: config.allowedExtensions,
       allowMultiple: false,
-      withData: false,
+      withData: true,
       lockParentWindow: true,
     );
 
@@ -91,14 +91,14 @@ class DocumentFilePickerService {
   }
 
   static String _unsupportedTypeMessageAr(DocumentSlotConfig config) {
-    if (config.id == DocumentField.profilePhoto) {
+    if (config.id == DocumentField.ProfilePhoto) {
       return 'نوع الملف غير مدعوم. يُسمح فقط بـ JPG أو PNG';
     }
     return 'الملف غير مدعوم. يُسمح بـ JPG أو PNG أو PDF فقط';
   }
 
   static String _unsupportedTypeMessageEn(DocumentSlotConfig config) {
-    if (config.id == DocumentField.profilePhoto) {
+    if (config.id == DocumentField.ProfilePhoto) {
       return 'File type not supported. Only JPG or PNG are allowed';
     }
     return 'Unsupported file type. Only JPG, PNG or PDF allowed';
@@ -106,9 +106,9 @@ class DocumentFilePickerService {
 
   static String _oversizedMessageAr(DocumentSlotConfig config) {
     final limitMb = config.maxSizeBytes ~/ (1024 * 1024);
-    if (config.id == DocumentField.profilePhoto ||
-        config.id == DocumentField.nationalIdFront ||
-        config.id == DocumentField.nationalIdBack) {
+    if (config.id == DocumentField.ProfilePhoto ||
+        config.id == DocumentField.NationalIdFront ||
+        config.id == DocumentField.NationalIdBack) {
       return 'حجم الملف يتجاوز الحد المسموح به ($limitMb ميغابايت)';
     }
     return 'حجم الملف يتجاوز $limitMb ميغابايت';

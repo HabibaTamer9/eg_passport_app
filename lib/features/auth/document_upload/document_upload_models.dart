@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 /// Backend field keys for POST /uploads/document (EGY-103).
 enum DocumentField {
-  profilePhoto,
-  nationalIdFront,
-  nationalIdBack,
-  birthCertificate,
-  existingPassport,
+  ProfilePhoto,
+  NationalIdFront,
+  NationalIdBack,
+  BirthCertificate,
+  ExistingPassport,
 }
 
 /// Lifecycle of a single document slot on Step 3.
@@ -98,7 +98,7 @@ class DocumentUploadRegistry {
 
   static const List<DocumentSlotConfig> all = [
     DocumentSlotConfig(
-      id: DocumentField.profilePhoto,
+      id: DocumentField.ProfilePhoto,
       fieldName: 'profile_photo',
       titleAr: 'الصورة الشخصية',
       required: true,
@@ -112,7 +112,7 @@ class DocumentUploadRegistry {
       maxSizeBytes: mb5,
     ),
     DocumentSlotConfig(
-      id: DocumentField.nationalIdFront,
+      id: DocumentField.NationalIdFront,
       fieldName: 'national_id_front',
       titleAr: 'الرقم القومي - الوجه الأمامي',
       required: true,
@@ -125,7 +125,7 @@ class DocumentUploadRegistry {
       maxSizeBytes: mb5,
     ),
     DocumentSlotConfig(
-      id: DocumentField.nationalIdBack,
+      id: DocumentField.NationalIdBack,
       fieldName: 'national_id_back',
       titleAr: 'الرقم القومي - الوجه الخلفي',
       required: true,
@@ -138,7 +138,7 @@ class DocumentUploadRegistry {
       maxSizeBytes: mb5,
     ),
     DocumentSlotConfig(
-      id: DocumentField.birthCertificate,
+      id: DocumentField.BirthCertificate,
       fieldName: 'birth_certificate',
       titleAr: 'شهادة الميلاد',
       required: true,
@@ -151,7 +151,7 @@ class DocumentUploadRegistry {
       maxSizeBytes: mb10,
     ),
     DocumentSlotConfig(
-      id: DocumentField.existingPassport,
+      id: DocumentField.ExistingPassport,
       fieldName: 'existing_passport',
       titleAr: 'جواز السفر الحالي',
       required: false,

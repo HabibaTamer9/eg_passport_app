@@ -62,6 +62,11 @@
   "hello": "Hello",
   "next": "Next",
   "back": "Back",
+  "error": "Error",
+  "errorMessage": "An error occurred. Please try again later.",
+  "done": "Done",
+  "login_success": "Login successful",
+
   "Egyptian": "Egyptian",
   "Saudi": "Saudi",
   "Emirati": "Emirati",

@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           locale: context.locale,
           theme: MyThemeApp.lightTheme,
-          home: LoginScreen(),
+          home:LoginScreen(),
         );
       }
     );

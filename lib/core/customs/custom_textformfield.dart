@@ -11,7 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool obscureText;
   final TextInputType keyboardType;
-  final IconData? suffixIcon;
+  final IconButton? suffixIcon;
   final int? maxLength;
   final VoidCallback? onTap;
 
@@ -75,13 +75,7 @@ class CustomTextFormField extends StatelessWidget {
 
             decoration: InputDecoration(
 
-              suffixIcon: suffixIcon != null
-                  ? Icon(
-                suffixIcon,
-                color: AppColors.greyColor,
-                size: 22,
-              )
-                  : null,
+              suffixIcon: suffixIcon,
               hintText: hint,
               hintStyle:Theme.of(context).textTheme.bodySmall,
 

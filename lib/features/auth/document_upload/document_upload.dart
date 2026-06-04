@@ -1,14 +1,18 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
+import 'package:eg_passport_app/core/theme/app_colors.dart';
+import 'package:eg_passport_app/features/auth/otp/view/otp_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/Api/api_helper.dart';
 import '../../../core/Api/endpoint.dart';
 import '../../../core/customs/custom_button.dart';
 import '../../../core/data/app_data.dart';
-import '../../../core/models/user_model.dart';
-import '../../main_screen/main_screen.dart';
-import '../login_screen/widgets/background.dart';
+import '../widgets/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../otp/cubit/otp_cubit.dart';
 import 'document_file_picker_service.dart';
 import 'document_upload_models.dart';
 
@@ -38,7 +42,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
   /// Progress milestones shown while [_simulateNetworkUpload] runs.
   static const List<int> _uploadProgressSteps = [40, 70, 100];
 
-  final Map<DocumentField, DocumentUploadSlotState> _uploads = {
+  late final Map<DocumentField, DocumentUploadSlotState> _uploads = {
     for (final field in DocumentField.values) field: DocumentUploadSlotState(),
   };
 
@@ -89,7 +93,8 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       await _simulateNetworkUpload(field);
     } on DocumentPickValidationException catch (error) {
       _showSnack(error.messageAr, isError: true);
-    } catch (_) {
+    } catch (e) {
+      print(e);
       _showSnack(
         'فشل رفع الملف. تحقق من اتصالك بالإنترنت وحاول مرة أخرى',
         isError: true,
@@ -224,9 +229,8 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-
                   Navigator.of(context).pop();
-
+                  uploadAndSubmitApplication();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _crimsonRed,
@@ -244,7 +248,9 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       },
     );
   }
+
   String messageLanguage = ApiHelper.messageLanguage;
+
   String _apiMessage(Map<String, dynamic> response) {
     final errors = response["errors"];
     if (errors.isNotEmpty) {
@@ -254,63 +260,115 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     return response[messageLanguage] ?? "حدث خطأ غير متوقع";
   }
 
-  void _saveAuthTokens(Map<String, dynamic> response) {
-    final data = response["data"];
-    if (data is Map) {
-      ApiHelper.accessToken = data["accessToken"]?.toString();
-      ApiHelper.refreshToken = data["refreshToken"]?.toString();
-    }
-  }
-
-  Future<void> _showApiDialog({required String title, required String message,}) async {
+  Future<void> _showApiDialog({
+    required String title,
+    required String message,
+  }) async {
     if (!mounted) return;
 
     await showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title),
         content: Text(message),
         actions: [
-          CustomButton(
-            textName: "OK",
-            onPressed: () => Navigator.pop(context),
-          )
+          CustomButton(textName: "OK", onPressed: () => Navigator.pop(context)),
         ],
       ),
     );
   }
 
-  Future<void> documentUpload()async {
-    try {
-      var response = await ApiHelper().postAPI(Endpoint.uploadDoc, {});
+  String _documentTypeName(DocumentField field) {
+    return field.toString().split('.').last;
+  }
 
-      if (response["success"] != true) {
-        await _showApiDialog(title: "خطأ", message: _apiMessage(response));
+  Future<String?> _ensureDraftApplication() async {
+    if (AppData.user.applicationId != null &&
+        AppData.user.applicationId!.isNotEmpty) {
+      return AppData.user.applicationId;
+    }
+
+    final response = await ApiHelper().postAPI("${Endpoint.appURL}draft", {});
+    if (response["success"] != true) {
+      return null;
+    }
+
+    final applicationId = response["data"]?["id"]?.toString();
+    AppData.user.applicationId = applicationId;
+    AppData.user.appNumber = response["data"]?["applicationNumber"]?.toString();
+    return applicationId;
+  }
+
+  Future<void> uploadAndSubmitApplication() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("جاري رفع المستندات"),
+        content: Center(
+          child: CircularProgressIndicator(color: AppColors.primaryRedColor),
+        ),
+      ),
+    );
+
+    try {
+      final applicationId = await _ensureDraftApplication();
+      if (applicationId == null) {
+        if (mounted) Navigator.of(context, rootNavigator: true).pop();
+        await _showApiDialog(title: "خطأ", message: "تعذر إنشاء طلب جديد.");
         return;
       }
 
-      _saveAuthTokens(response);
+      final selectedDocuments = _uploads.entries
+          .where((entry) =>
+      entry.value.filePath != null &&
+          entry.value.filePath!.trim().isNotEmpty)
+          .toList();
+
+      for (final document in selectedDocuments) {
+        final path = document.value.filePath!;
+        final fileName = path.split(RegExp(r'[\\/]')).last;
+        final formData = FormData.fromMap({
+          "DocumentType": _documentTypeName(document.key),
+          "File": await MultipartFile.fromFile(path, filename: fileName),
+        });
+
+        final response = await ApiHelper().docPostAPI(
+          "${Endpoint.appURL}$applicationId/${Endpoint.documents}",
+          formData,
+        );
+
+        if (response["success"] != true) {
+          if (mounted) Navigator.of(context, rootNavigator: true).pop();
+          await _showApiDialog(title: "خطأ", message: _apiMessage(response));
+          return;
+        }
+      }
+
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
       await _showApiDialog(
         title: "تم",
-        message: response["messageAr"] ?? "تم تسجيل الدخول بنجاح",
+        message: "تم رفع المستندات. أكمل التحقق من رمز OTP لإرسال الطلب.",
       );
 
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
+        MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (_) => OtpCubit(),
+            child: const OtpScreen(),
+          ),
+        ),
       );
-      return;
-    }catch (e){
-      showDialog(context: context, builder: (context) =>
-          AlertDialog(
-            title: Center(child: Text("حدث خطأ ما من فضلك حاول مره اخرى لاحقا",textAlign: TextAlign.center,)),
-            actions: [
-              CustomButton(textName: "OK", onPressed: () {
-                Navigator.pop(context);
-              },)
-            ],
-          ));
+    } catch (e) {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      await _showApiDialog(
+        title: "خطأ",
+        message: "حدث خطأ أثناء رفع المستندات. حاول مرة أخرى.",
+      );
     }
   }
 
@@ -360,6 +418,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
 
   Widget _buildMobileLayout() {
     return Background(
+      currentIndex: 2,
       child: Column(
         children: [
           Expanded(
@@ -696,8 +755,6 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: isWide ? 24.h : 16.h),
-        _buildStepIndicator(isWide: isWide),
         SizedBox(height: isWide ? 24 : 16),
         if (isWide) ...[_buildDropZone(), const SizedBox(height: 24)],
         Text(
@@ -736,85 +793,6 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
         ],
       ),
       child: content,
-    );
-  }
-
-  Widget _buildStepIndicator({required bool isWide}) {
-    const steps = [
-      'إنشاء الحساب',
-      'البيانات الشخصية',
-      'رفع المستندات',
-      'المراجعة النهائية',
-    ];
-
-    return Row(
-      children: List.generate(steps.length * 2 - 1, (index) {
-        if (index.isOdd) {
-          final completedConnector = index ~/ 2 < 2;
-          return Expanded(
-            child: Container(
-              height: 1.5,
-              margin: const EdgeInsets.only(bottom: 23),
-              color: completedConnector ? _successGreen : _borderColor,
-            ),
-          );
-        }
-
-        final stepIndex = index ~/ 2;
-        final isCompleted = stepIndex < 2;
-        final isActive = stepIndex == 2;
-
-        return SizedBox(
-          width: isWide ? 116 : 78,
-          child: Column(
-            children: [
-              Container(
-                width: isWide ? 30 : 24,
-                height: isWide ? 30 : 24,
-                decoration: BoxDecoration(
-                  color: isCompleted
-                      ? _successGreen
-                      : isActive
-                      ? _crimsonRed
-                      : const Color(0xFFF0EDE8),
-                  shape: BoxShape.circle,
-                  border: isCompleted || isActive
-                      ? null
-                      : Border.all(color: _borderColor),
-                ),
-                child: Center(
-                  child: isCompleted
-                      ? const Icon(Icons.check, color: Colors.white, size: 16)
-                      : Text(
-                          '${stepIndex + 1}',
-                          style: TextStyle(
-                            color: isActive ? Colors.white : _mutedText,
-                            fontSize: isWide ? 12 : 10,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                steps[stepIndex],
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: isActive
-                      ? _crimsonRed
-                      : isCompleted
-                      ? _ink
-                      : _mutedText,
-                  fontSize: isWide ? 11 : 9,
-                  fontWeight: isActive ? FontWeight.w900 : FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
     );
   }
 
@@ -1430,7 +1408,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       );
     }
 
-    final isPassport = document.id == DocumentField.existingPassport;
+    final isPassport = document.id == DocumentField.ExistingPassport;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -1488,7 +1466,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
   ) {
     const foreground = Color(0xCC201B16);
 
-    if (document.id == DocumentField.profilePhoto) {
+    if (document.id == DocumentField.ProfilePhoto) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1504,19 +1482,11 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(6),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(document.icon, color: foreground, size: 24),
-          const SizedBox(height: 7),
-          Container(height: 3, decoration: _previewLineDecoration(0.90)),
-          const SizedBox(height: 4),
-          Container(height: 3, decoration: _previewLineDecoration(0.70)),
-          if (state.hasSelectedFile) ...[
-            const SizedBox(height: 6),
-            _previewFileName(state.fileName!),
-          ],
+          Icon(document.icon, color: foreground, size: 24.sp),
         ],
       ),
     );
@@ -1532,7 +1502,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
         textAlign: TextAlign.center,
         style: TextStyle(
           color: _ink.withValues(alpha: 0.75),
-          fontSize: 9,
+          fontSize: 9.sp,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -1549,20 +1519,10 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.workspace_premium, color: _goldAccent, size: 28),
-          if (state.hasSelectedFile) ...[
-            const SizedBox(height: 4),
-            _previewFileName(state.fileName!),
-          ],
+          const Icon(Icons.workspace_premium, color: _goldAccent, size: 24),
+
         ],
       ),
-    );
-  }
-
-  BoxDecoration _previewLineDecoration(double opacity) {
-    return BoxDecoration(
-      color: Colors.white.withValues(alpha: opacity),
-      borderRadius: BorderRadius.circular(99),
     );
   }
 
@@ -1596,7 +1556,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
           const Icon(Icons.cloud_upload_outlined, color: _mutedText, size: 16),
           const SizedBox(width: 5),
           Text(
-            document.id == DocumentField.existingPassport
+            document.id == DocumentField.ExistingPassport
                 ? 'لم يتم رفع ملف'
                 : 'اضغط للرفع',
             style: const TextStyle(

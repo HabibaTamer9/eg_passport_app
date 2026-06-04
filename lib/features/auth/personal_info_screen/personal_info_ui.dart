@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/core/customs/custom_button.dart';
-import 'package:eg_passport_app/core/data/app_data.dart';
 import 'package:eg_passport_app/core/theme/app_colors.dart';
+import 'package:eg_passport_app/features/auth/personal_info_screen/personal_info_cubit/personal_info_cubit.dart';
+import 'package:eg_passport_app/features/auth/personal_info_screen/personal_info_cubit/personal_info_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../document_upload/document_upload.dart';
-import '../login_screen/widgets/background.dart';
+import '../widgets/background.dart';
 import 'data/personal_list.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/Api/api_helper.dart';
-import '../../../core/Api/endpoint.dart';
 import '../../../core/customs/custom_dropdown.dart';
 import '../../../core/customs/custom_textformfield.dart';
 import 'app_validator.dart';
@@ -34,22 +34,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   String? selectedPlaceOfBirth;
   String? selectedNationality;
 
-  String _apiMessage(Map<String, dynamic> response) {
-    final errors = response["errors"];
-    if (errors is List && errors.isNotEmpty && errors.first is Map) {
-      final firstError = Map<String, dynamic>.from(errors.first as Map);
-      return firstError["messageAr"] ??
-          firstError["messageEn"] ??
-          firstError["message"] ??
-          "حدث خطأ في البيانات";
-    }
-
-    return response["messageAr"] ??
-        response["messageEn"] ??
-        response["message"] ??
-        "حدث خطأ غير متوقع";
-  }
-
   Future<void> _showApiDialog({
     required String title,
     required String message,
@@ -62,7 +46,13 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         title: Text(title),
         content: Text(message),
         actions: [
-          CustomButton(textName: "OK", onPressed: () => Navigator.pop(context)),
+          CustomButton(
+            textName: "OK",
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+          ),
         ],
       ),
     );
@@ -78,359 +68,222 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     super.dispose();
   }
 
-  void getUser(response) {
-    AppData.user.nationalID = nationalIdController.text.trim() as int?;
-    AppData.user.gender = selectedGender;
-    AppData.user.dateOfBirth = birthDateController.text.trim();
-    AppData.user.city = selectedGovernorate;
-    AppData.user.address = addressController.text.trim();
-    AppData.user.birthCity = selectedPlaceOfBirth;
-    AppData.user.nationality = selectedNationality;
-  }
-
-  void personalInfo() async {
-    try {
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => Center(child: CircularProgressIndicator()),
-      );
-      var response = await ApiHelper().putAPI(
-        "${Endpoint.appURL}${AppData.user.uID}/${Endpoint.personalInfo}",
-        {
-          "nationalId": nationalIdController.text.trim(),
-          "governorate":
-              selectedGovernorate ?? governorateController.text.trim(),
-          "address": addressController.text.trim(),
-          "nationality": selectedNationality,
-          "placeOfBirth": selectedPlaceOfBirth,
-          "profilePhotoUrl": null,
-        },
-      );
-
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop();
-
-      if (response["success"] != true) {
-        await _showApiDialog(title: 'error'.tr(), message: _apiMessage(response));
-        return;
-      }
-
-      await _showApiDialog(
-        title: "تم",
-        message: response["messageAr"] ?? "تم حفظ البيانات بنجاح",
-      );
-      getUser(response);
-      print("response: $response");
-
-      if (!mounted) return;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DocumentUploadScreen()),
-      );
-      return;
-    } catch (e) {
-      print("e:  $e");
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-      }
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Center(
-            child: Text(
-              'errorMessage'.tr(),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          actions: [
-            CustomButton(
-              textName: "OK",
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Background(
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    /// TITLE
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+      body: BlocProvider(
+        create: (context) => PersonalInfoCubit(),
+        child: BlocBuilder<PersonalInfoCubit, PersonalInfoState>(
+          builder: (context, state) {
+            if (state is PersonalInfoLoading) {
+              showDialog(
+                context: context,
+                builder: (context) => Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (state is PersonalInfoFailure) {
+              _showApiDialog(title: 'error'.tr(), message: state.error);
+            }
+            if (state is PersonalInfoSuccess) {
+              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DocumentUploadScreen()),
+              );
+            }
+            return Background(
+              currentIndex: 1,
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          "personal_info".tr(),
-                          style: TextStyle(
-                            color: const Color(0xff111827),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        /// TITLE
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "personal_info".tr(),
+                              style: TextStyle(
+                                color: const Color(0xff111827),
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            SizedBox(width: 10.w),
+
+                            Container(
+                              height: 25.h,
+                              width: 25.w,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xffE5E7EB),
+                                  width: 1.w,
+                                ),
+                                borderRadius: BorderRadius.circular(20.r),
+                              ),
+                              child: Icon(
+                                Icons.person_2_outlined,
+                                size: 15.sp,
+                                color: const Color(0xff6B7280),
+                              ),
+                            ),
+                          ],
                         ),
 
-                        SizedBox(width: 10.w),
-
-                        Container(
-                          height: 25.h,
-                          width: 25.w,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xffE5E7EB),
-                              width: 1.w,
-                            ),
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Icon(
-                            Icons.person_2_outlined,
-                            size: 15.sp,
+                        Text(
+                          "personal_info_desc".tr(),
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             color: const Color(0xff6B7280),
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
 
-                    Text(
-                      "personal_info_desc".tr(),
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: const Color(0xff6B7280),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                        SizedBox(height: 15.h),
 
-                    SizedBox(height: 15.h),
+                        /// NATIONAL ID
+                        CustomTextFormField(
+                          title: "national_id".tr(),
+                          hint: "national_id_hint".tr(),
+                          isRequired: true,
+                          controller: nationalIdController,
+                          keyboardType: TextInputType.number,
+                          hinticon: Icons.credit_card,
+                          maxLength: 14,
+                          validator: (value) {
+                            return AppValidators.validateNationalId(
+                              value,
+                              context,
+                            );
+                          },
+                        ),
 
-                    /// NATIONAL ID
-                    CustomTextFormField(
-                      title: "national_id".tr(),
-                      hint: "national_id_hint".tr(),
-                      isRequired: true,
-                      controller: nationalIdController,
-                      keyboardType: TextInputType.number,
-                      hinticon: Icons.credit_card,
-                      maxLength: 14,
-                      validator: (value) {
-                        return AppValidators.validateNationalId(value, context);
-                      },
-                    ),
+                        SizedBox(height: 12.h),
 
-                    SizedBox(height: 12.h),
-
-                    /// GENDER + DOB
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                        /// GENDER + DOB
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "gender".tr(),
-                                    style: const TextStyle(
-                                      color: Color(0xff374151),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "gender".tr(),
+                                        style: const TextStyle(
+                                          color: Color(0xff374151),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 8),
+
+                                      const Icon(
+                                        Icons.star,
+                                        color: Colors.red,
+                                        size: 10,
+                                      ),
+                                    ],
                                   ),
 
-                                  const SizedBox(width: 8),
+                                  const SizedBox(height: 8),
 
-                                  const Icon(
-                                    Icons.star,
-                                    color: Colors.red,
-                                    size: 10,
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: CustomDropDown(
+                                      value: selectedGender,
+                                      items: PersonalList.genderItems,
+                                      hint: "gender".tr(),
+
+                                      validator: (value) {
+                                        return AppValidators.validateGender(
+                                          value,
+                                          context,
+                                        );
+                                      },
+
+                                      onChanged: (String? value) {
+                                        setState(() {
+                                          selectedGender = value;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
-
-                              const SizedBox(height: 8),
-
-                              SizedBox(
-                                width: double.infinity,
-                                child: CustomDropDown(
-                                  value: selectedGender,
-                                  items: PersonalList.genderItems,
-                                  hint: "gender".tr(),
-
-                                  validator: (value) {
-                                    return AppValidators.validateGender(
-                                      value,
-                                      context,
-                                    );
-                                  },
-
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      selectedGender = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(width: 10.w),
-
-                        Expanded(
-                          child: CustomTextFormField(
-                            title: "dob".tr(),
-                            hint: "dob_hint".tr(),
-                            isRequired: true,
-                            controller: birthDateController,
-                            keyboardType: TextInputType.datetime,
-                            hinticon: Icons.calendar_today,
-
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime.now(),
-                              );
-
-                              if (pickedDate != null) {
-                                String formattedDate =
-                                    "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-
-                                birthDateController.text = formattedDate;
-
-                                setState(() {});
-                              }
-                            },
-
-                            validator: (value) {
-                              return AppValidators.validateDob(value, context);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 12.h),
-
-                    /// GOVERNORATE
-                    Row(
-                      children: [
-                        Text(
-                          "governorate".tr(),
-                          style: const TextStyle(
-                            color: Color(0xff374151),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        const SizedBox(width: 8),
-
-                        const Icon(Icons.star, color: Colors.red, size: 10),
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: CustomDropDown(
-                        items: [
-                          for (String governorate
-                              in PersonalList.egyptGovernorates)
-                            DropdownMenuItem<String>(
-                              value: governorate,
-                              child: Text(governorate),
                             ),
-                        ],
 
-                        hint: "governorate".tr(),
-                        hinticon: Icons.location_on,
-                        value: selectedGovernorate,
+                            SizedBox(width: 10.w),
 
-                        validator: (value) {
-                          return AppValidators.validateGovernorate(
-                            value,
-                            context,
-                          );
-                        },
+                            Expanded(
+                              child: CustomTextFormField(
+                                title: "dob".tr(),
+                                hint: "dob_hint".tr(),
+                                isRequired: true,
+                                controller: birthDateController,
+                                keyboardType: TextInputType.datetime,
+                                hinticon: Icons.calendar_today,
 
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedGovernorate = value;
-                          });
-                        },
-                      ),
-                    ),
+                                onTap: () async {
+                                  DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime.now(),
+                                  );
 
-                    SizedBox(height: 12.h),
+                                  if (pickedDate != null) {
+                                    String formattedDate =
+                                        "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
 
-                    /// ADDRESS
-                    CustomTextFormField(
-                      title: "address".tr(),
-                      hint: "address_hint".tr(),
-                      isRequired: true,
-                      maxLength: 200,
-                      controller: addressController,
-                      keyboardType: TextInputType.text,
-                      hinticon: Icons.home,
+                                    birthDateController.text = formattedDate;
 
-                      validator: (value) {
-                        return AppValidators.validateAddress(value, context);
-                      },
-                    ),
+                                    setState(() {});
+                                  }
+                                },
 
-                    SizedBox(height: 12.h),
-
-                    /// NATIONALITY + PLACE OF BIRTH
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomDropDown(
-                            items: [
-                              for (String nationality
-                                  in PersonalList.nationalities)
-                                DropdownMenuItem<String>(
-                                  value: nationality,
-                                  child: Text(nationality.tr()),
-                                ),
-                            ],
-
-                            hint: "nationality".tr(),
-                            hinticon: Icons.flag,
-                            value: selectedNationality,
-
-                            validator: (value) {
-                              return AppValidators.validateNationality(
-                                value,
-                                context,
-                              );
-                            },
-
-                            onChanged: (String? value) {
-                              setState(() {
-                                selectedNationality = value;
-                              });
-                            },
-                          ),
+                                validator: (value) {
+                                  return AppValidators.validateDob(
+                                    value,
+                                    context,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
 
-                        SizedBox(width: 10.w),
+                        SizedBox(height: 12.h),
 
-                        Expanded(
+                        /// GOVERNORATE
+                        Row(
+                          children: [
+                            Text(
+                              "governorate".tr(),
+                              style: const TextStyle(
+                                color: Color(0xff374151),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            const Icon(Icons.star, color: Colors.red, size: 10),
+                          ],
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        SizedBox(
+                          width: double.infinity,
                           child: CustomDropDown(
                             items: [
                               for (String governorate
@@ -441,9 +294,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 ),
                             ],
 
-                            hint: "place_of_birth".tr(),
+                            hint: "governorate".tr(),
                             hinticon: Icons.location_on,
-                            value: selectedPlaceOfBirth,
+                            value: selectedGovernorate,
 
                             validator: (value) {
                               return AppValidators.validateGovernorate(
@@ -454,49 +307,145 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
                             onChanged: (String? value) {
                               setState(() {
-                                selectedPlaceOfBirth = value;
+                                selectedGovernorate = value;
                               });
                             },
                           ),
                         ),
+
+                        SizedBox(height: 12.h),
+
+                        /// ADDRESS
+                        CustomTextFormField(
+                          title: "address".tr(),
+                          hint: "address_hint".tr(),
+                          isRequired: true,
+                          maxLength: 200,
+                          controller: addressController,
+                          keyboardType: TextInputType.text,
+                          hinticon: Icons.home,
+
+                          validator: (value) {
+                            return AppValidators.validateAddress(value, context);
+                          },
+                        ),
+
+                        SizedBox(height: 12.h),
+
+                        /// NATIONALITY + PLACE OF BIRTH
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomDropDown(
+                                items: [
+                                  for (String nationality
+                                      in PersonalList.nationalities)
+                                    DropdownMenuItem<String>(
+                                      value: nationality,
+                                      child: Text(nationality.tr()),
+                                    ),
+                                ],
+
+                                hint: "nationality".tr(),
+                                hinticon: Icons.flag,
+                                value: selectedNationality,
+
+                                validator: (value) {
+                                  return AppValidators.validateNationality(
+                                    value,
+                                    context,
+                                  );
+                                },
+
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedNationality = value;
+                                  });
+                                },
+                              ),
+                            ),
+
+                            SizedBox(width: 10.w),
+
+                            Expanded(
+                              child: CustomDropDown(
+                                items: [
+                                  for (String governorate
+                                      in PersonalList.egyptGovernorates)
+                                    DropdownMenuItem<String>(
+                                      value: governorate,
+                                      child: Text(governorate),
+                                    ),
+                                ],
+
+                                hint: "place_of_birth".tr(),
+                                hinticon: Icons.location_on,
+                                value: selectedPlaceOfBirth,
+
+                                validator: (value) {
+                                  return AppValidators.validateGovernorate(
+                                    value,
+                                    context,
+                                  );
+                                },
+
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedPlaceOfBirth = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 20.h),
+
+                        /// BUTTONS
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: CustomButton(
+                                textName: 'next'.tr(),
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    context
+                                        .read<PersonalInfoCubit>()
+                                        .personalInfo(
+                                          nationalIdController.text,
+                                          selectedGender!,
+                                          birthDateController.text,
+                                          selectedGovernorate!,
+                                          addressController.text,
+                                          selectedPlaceOfBirth!,
+                                          selectedNationality!,
+                                        );
+                                  }
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: CustomButton(
+                                textName: 'back'.tr(),
+                                textColor: AppColors.primaryRedColor,
+                                backgroundColor: Colors.white,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20.h),
                       ],
                     ),
-
-                    SizedBox(height: 20.h),
-
-                    /// BUTTONS
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: CustomButton(
-                            textName: 'next'.tr(),
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                personalInfo();
-                              }
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: CustomButton(
-                            textName: 'back'.tr(),
-                            textColor: AppColors.primaryRedColor,
-                            backgroundColor: Colors.white,
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

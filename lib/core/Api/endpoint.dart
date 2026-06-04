@@ -8,7 +8,7 @@ class Endpoint {
 
  static const String _androidEmulatorBaseURL = String.fromEnvironment(
   'ANDROID_API_BASE_URL',
-  defaultValue: 'http://10.0.2.2:5000/',
+  defaultValue: 'http://192.168.1.18:5000/',
  );
 
  static String get baseURL {
@@ -22,6 +22,7 @@ class Endpoint {
  static const String authURL = 'api/auth/';
  static const String appURL = 'api/applications/';
  static const String meProfile = 'api/me/profile';
+ static const String my = 'api/me/';
 
  static const String login = 'login';
  static const String register = 'register';
@@ -31,8 +32,10 @@ class Endpoint {
  static const String checkEmail = 'check-email';
  static const String checkPone = 'check-mobile';
  static const String documents = 'documents';
+ static const String notifications = 'notifications';
  static const String submit = 'submit';
  static const String status = 'status';
+ static const String applications = 'applications';
 
  static const String sendOTP = 'api/otp/send';
  static const String verifyOTP = 'api/otp/verify';

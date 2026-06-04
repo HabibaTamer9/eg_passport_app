@@ -3,7 +3,7 @@ import 'package:eg_passport_app/core/Api/api_helper.dart';
 import 'package:eg_passport_app/core/Api/endpoint.dart';
 import 'package:eg_passport_app/core/data/app_data.dart';
 import '../../../core/models/user_model.dart';
-import '../login_screen/widgets/background.dart';
+import '../widgets/background.dart';
 import '../personal_info_screen/personal_info_ui.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

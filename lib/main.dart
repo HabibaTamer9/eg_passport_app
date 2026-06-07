@@ -1,17 +1,13 @@
-<<<<<<< HEAD
-import 'package:easy_localization/easy_localization.dart';
-//import 'package:eg_passport_app/login_screen/login_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:eg_passport_app/document_upload.dart';
-=======
-import 'package:easy_localization/easy_localization.dart' show EasyLocalization, BuildContextEasyLocalizationExtension;
+import 'package:easy_localization/easy_localization.dart'
+    show EasyLocalization, BuildContextEasyLocalizationExtension;
 import 'package:eg_passport_app/LoginScreen.dart';
+import 'package:eg_passport_app/notification_screen/notification_cubit.dart';
+import 'package:eg_passport_app/notification_screen/notification_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'register/register_screen.dart';
 import 'theme/my_theme_app.dart';
->>>>>>> 780527c47407ca49dedaeccb8ae77f6069744d8f
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +15,7 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ar'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('ar'),
       startLocale: const Locale('ar'), // 🔥 مهم جدًا
@@ -48,28 +41,15 @@ class MyApp extends StatelessWidget {
 
           // 🔥 localization
           locale: context.locale,
-<<<<<<< HEAD
-          home: const DocumentUploadScreen(),
-=======
-          supportedLocales: context.supportedLocales,
-          localizationsDelegates: context.localizationDelegates,
 
-          // 🔥 الاتجاه الصح (RTL/LTR)
-          builder: (context, widget) {
-            return Directionality(
-              textDirection: context.locale.languageCode == 'ar'
-                  ? TextDirection.rtl
-                  : TextDirection.ltr,
-              child: widget ?? const SizedBox(),
-            );
+          home: BlocProvider(
+  create: (context) => NotificationCubit(),
+  child: const NotificationUi(),
+),
+          routes: {
+            RegisterScreen.routeName: (context) => const RegisterScreen(),
+            Loginscreen.routeName: (context) => const Loginscreen(),
           },
-
-          home: const RegisterScreen(),
-            routes: {
-              RegisterScreen.routeName: (context) => const RegisterScreen(),
-             Loginscreen.routeName: (context) => const Loginscreen(),
-            }
->>>>>>> 780527c47407ca49dedaeccb8ae77f6069744d8f
         );
       },
     );

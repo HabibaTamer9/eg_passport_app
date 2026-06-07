@@ -95,6 +95,17 @@
   "South African": "South African",
   "Nigerian": "Nigerian",
   "Kenyan": "Kenyan",
-  "Ethiopian": "Ethiopian"
+  "Ethiopian": "Ethiopian",
+  "Notification": "Notifications",
+  "Notification_subtitle": "Stay up-to-date with all the alerts and updates that matter to you",
+"All": "All",
+  "Read": "Read",
+  "Unread": "Unread",
+  "Request": "Request",
+  "Alert": "Alert", 
+  "Documents": "Documents",
+  "New": "New",
+  "Notification Details": "Notification Details"
+
 
 }

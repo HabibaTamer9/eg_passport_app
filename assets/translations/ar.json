@@ -92,4 +92,17 @@
   "Nigerian": "نيجيري",
   "Kenyan": "كيني",
   "Ethiopian": "إثيوبي"
+,
+ "Notification": "الإشعارات",
+  "Notification_subtitle": "تابع كل ما يهمك من تنبيهات وتحديثات ",
+  "All": "الكل",
+  "Read": "مقروء",
+  "Unread": "غير مقروء",
+  "Request": "طلب",
+  "Alert": "تنبيه", 
+  "Documents": "وثائق",
+   "New": "جديد",
+   "Notification Details": "تفاصيل الإشعار"
+
+
 }

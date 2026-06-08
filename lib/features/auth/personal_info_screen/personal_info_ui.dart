@@ -50,7 +50,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             textName: "OK",
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(context);
             },
           ),
         ],

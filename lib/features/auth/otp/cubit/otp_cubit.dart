@@ -6,7 +6,9 @@ import '../../../../core/Api/endpoint.dart';
 import 'otp_state.dart';
 
 class OtpCubit extends Cubit<OtpState> {
-  OtpCubit() : super(OtpInitial());
+  OtpCubit() : super(OtpInitial(
+
+  ));
 
   int seconds = 300;
   int attempts = 0;
@@ -37,7 +39,7 @@ class OtpCubit extends Cubit<OtpState> {
         "mobileNumber": AppData.user.phoneNumber,
         "purpose": "Register"
       });
-
+      print(response);
       if (response["success"] != true) {
         emit(OtpError(_apiMessage(response)));
         return;

@@ -25,6 +25,8 @@ class _OtpScreenState extends State<OtpScreen> {
   );
 
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
+  int timerSeconds = 0;
+  String errorText = "";
 
   @override
   void dispose() {
@@ -56,10 +58,9 @@ class _OtpScreenState extends State<OtpScreen> {
     return Scaffold(
       body: Background(
         currentIndex: 3,
-        child: BlocBuilder<OtpCubit, OtpState>(
-          builder: (context, state) {
-            int timerSeconds = cubit.seconds;
-            String errorText = "";
+        child: BlocConsumer<OtpCubit, OtpState>(
+          listener: (context, state) {
+            timerSeconds = cubit.seconds;
 
             if (state is OtpTimerRunning) {
               timerSeconds = state.seconds;
@@ -71,13 +72,13 @@ class _OtpScreenState extends State<OtpScreen> {
 
             if (state is OtpLocked) {
               errorText =
-                  "${'otp_error'.tr()} ${state.lockMinutes} ${'minutes'.tr()}";
+              "${'otp_error'.tr()} ${state.lockMinutes} ${'minutes'.tr()}";
             }
             if (state is OtpSuccess) {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()));
             }
-
-
+          },
+          builder: (context, state) {
             return SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

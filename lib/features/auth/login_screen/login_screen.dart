@@ -5,6 +5,8 @@ import 'package:eg_passport_app/core/theme/app_colors.dart';
 import 'package:eg_passport_app/features/auth/document_upload/document_upload.dart';
 import 'package:eg_passport_app/features/auth/login_screen/login_cubit/login_cubit.dart';
 import 'package:eg_passport_app/features/auth/login_screen/login_cubit/login_state.dart';
+import 'package:eg_passport_app/features/auth/otp/cubit/otp_cubit.dart';
+import 'package:eg_passport_app/features/auth/otp/view/otp_screen.dart';
 import 'package:eg_passport_app/features/auth/personal_info_screen/personal_info_ui.dart';
 import 'package:eg_passport_app/features/main_screen/main_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,7 +100,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => DocumentUploadScreen()),
                 );
-              } else {
+              }
+              else if (AppData.user.state == "Draft") {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => BlocProvider(
+                      create: (_) => OtpCubit(),
+                      child: OtpScreen())),
+                );
+              }
+              else {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => MainScreen()),

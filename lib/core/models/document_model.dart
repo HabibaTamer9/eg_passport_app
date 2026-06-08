@@ -1,3 +1,5 @@
+import 'package:eg_passport_app/core/data/app_data.dart';
+
 class DocumentModel {
   final String documentId;
   final String applicationId;
@@ -8,6 +10,7 @@ class DocumentModel {
   final int fileSize;
   final String status;
   final String? rejectionReason;
+  final String? uploadedAt;
 
   DocumentModel({
     required this.documentId,
@@ -19,30 +22,40 @@ class DocumentModel {
     required this.fileSize,
     required this.status,
     this.rejectionReason,
+    this.uploadedAt,
   });
 
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
     return DocumentModel(
-      documentId: json['id'],
-      applicationId: json['applicationId'],
-      documentType: json['documentType'],
-      fileName: json['fileName'],
-      fileUrl: json['fileUrl'],
-      contentType: json['contentType'],
-      fileSize: json['fileSize'],
-      status: json['status'],
+      documentId: json['id'] ?? json['documentId'] ?? '',
+      applicationId: json['applicationId'] ?? '',
+      documentType: json['documentType'] ?? '',
+      fileName: json['fileName'] ?? '',
+      fileUrl: json['fileUrl'] ?? '',
+      contentType: json['contentType'] ?? '',
+      fileSize: json['fileSize'] ?? 0,
+      status: json['status'] ?? '',
       rejectionReason: json['rejectionReason'],
+      uploadedAt: AppData().formatDate(json['uploadedAt']),
+    );
+  }
+
+  DocumentModel copyWith({
+    String? status,
+    String? fileUrl,
+    String? uploadedAt,
+  }) {
+    return DocumentModel(
+      documentId: documentId,
+      applicationId: applicationId,
+      documentType: documentType,
+      fileName: fileName,
+      fileUrl: fileUrl ?? this.fileUrl,
+      contentType: contentType,
+      fileSize: fileSize,
+      status: status ?? this.status,
+      rejectionReason: rejectionReason,
+      uploadedAt: uploadedAt ?? this.uploadedAt,
     );
   }
 }
-
-//{id: d9ae4326-38e6-4f64-bc97-231b4063e441,
-// applicationId: a78b5853-e473-441d-86ad-406148583931,
-// documentType: ProfilePhoto,
-// fileName: a7d6b5fed030445a8e4a2e9b9802ff72.png,
-// fileUrl: /uploads/users/6ce990b1-56ce-47b7-8e33-1ac491171dce/applications/a78b5853-e473-441d-86ad-406148583931/ProfilePhoto/a7d6b5fed030445a8e4a2e9b9802ff72.png,
-// contentType: image/png,
-// fileSize: 3531,
-// status: Uploaded,
-// rejectionReason: null,
-// uploadedAt: 2026-06-03T18:27:52.7254826},

@@ -3,12 +3,12 @@ import 'package:flutter/foundation.dart';
 class Endpoint {
  static const String _localBaseURL = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://localhost:5000/',
+  defaultValue: 'https://egypassport.runasp.net/',
  );
 
  static const String _androidEmulatorBaseURL = String.fromEnvironment(
   'ANDROID_API_BASE_URL',
-  defaultValue: 'http://192.168.1.18:5000/',
+  defaultValue: 'https://egypassport.runasp.net/',
  );
 
  static String get baseURL {

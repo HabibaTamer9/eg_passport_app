@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eg_passport_app/features/notification_screen/data/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -6,6 +7,7 @@ import '../../../../core/Api/api_helper.dart';
 import '../../../../core/Api/endpoint.dart';
 import '../../../../core/data/app_data.dart';
 import '../../../../core/models/document_model.dart';
+import '../../../../core/models/passport_model.dart';
 import '../../../../core/models/user_model.dart';
 import 'login_state.dart';
 
@@ -29,15 +31,6 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
-  void getUser(var response) {
-    AppData.user = UserModel(
-      uID: response["userId"],
-      name: response["fullName"],
-      email: response["email"],
-      phoneNumber: response["mobileNumber"],
-    );
-  }
-
   Future<void> login(String email, String password, BuildContext context) async {
     emit(LoginLoading());
     showDialog(
@@ -49,7 +42,7 @@ class LoginCubit extends Cubit<LoginState> {
         "emailOrMobile": email,
         "password": password,
       });
-      print("======================Login : $response");
+      print("======================login : $response");
 
       if (response["success"] != true) {
         emit(LoginFailure(_apiMessage(response)));
@@ -57,21 +50,57 @@ class LoginCubit extends Cubit<LoginState> {
       }
 
       _saveAuthTokens(response);
-      getUser(response["data"]);
+      AppData.user = UserModel.fromJson(response["data"]);
+
+      //getAdminApplications();
       await getProfile();
       await getApplications();
-      await getState();
-      await getNotifications();
+      await getPassport();
 
      Future.delayed(Duration(seconds: 1),()=>emit(LoginSuccess()));
 
 
     } catch (e) {
-      print("======================Login : $e");
+      print("====================error $e");
       emit(LoginFailure("errorMessage".tr()));
     }
   }
 
+  Future<void> getPassport() async {
+    try {
+      var response = await ApiHelper().getAPI(
+        "/api/wallet",
+      );
+      AppData.passport = PassportModel.fromJson(response);
+      print("======================wallet : $response");
+    } catch (e) {
+      print("=========================error $e");
+    }
+  }
+  //
+  // Future<void> getAdminApplications() async {
+  //   try {
+  //     var response = await ApiHelper().getAPI(
+  //       "/api/admin/applications",
+  //     );
+  //     if (response["success"] != true) {
+  //       emit(LoginFailure(_apiMessage(response)));
+  //       return;
+  //     }
+  //    print("======================applications : $response");
+  //     AppData.user.applicationId = response["data"]["items"][0]["id"];
+  //     AppData.user.appNumber =
+  //         response["data"]["items"][0]["applicationNumber"];
+  //     List documents = response["data"]["items"][0]["documents"];
+  //     AppData.user.documents = documents
+  //         .map((d) => DocumentModel.fromJson(d))
+  //         .toList();
+  //     AppData.user.documents?.forEach((d)=> verify(d.documentId));
+  //   } catch (e) {
+  //     print("=========================error $e");
+  //     emit(LoginFailure("applicationError:${"errorMessage".tr()}"));
+  //   }
+  // }
   Future<void> getApplications() async {
     try {
       var response = await ApiHelper().getAPI(
@@ -81,34 +110,55 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginFailure(_apiMessage(response)));
         return;
       }
-      AppData.user.applicationId = response["data"]["items"][0]["id"];
-      AppData.user.appNumber =
-          response["data"]["items"][0]["applicationNumber"];
-      List documents = response["data"]["items"][0]["documents"];
-      AppData.user.documents = documents
-          .map((d) => DocumentModel.fromJson(d))
-          .toList();
-      AppData.user.profileImage =AppData.user.documents!
-          .where((d) => d.documentType == "ProfilePhoto")
-          .first
-          .fileUrl;
+      print("======================applications : $response");
+      if(response["data"]["items"].length > 0) {
+        AppData.user.applicationId = response["data"]["items"][0]["id"];
+        AppData.user.appNumber =
+        response["data"]["items"][0]["applicationNumber"];
+        List documents = response["data"]["items"][0]["documents"];
+        AppData.user.documents = documents
+            .map((d) => DocumentModel.fromJson(d))
+            .toList();
+      }else{
+        AppData.user.applicationId = null;
+        AppData.user.appNumber = null;
+        AppData.user.documents = [];
+      }
+    if(AppData.user.documents!.isNotEmpty) await getState();
+
+      //AppData.user.documents?.forEach((d)=> verify(d.documentId));
     } catch (e) {
-      print("======================Applications : $e");
       emit(LoginFailure("applicationError:${"errorMessage".tr()}"));
     }
   }
 
+  Future<void> verify(id) async {
+    try {
+      var response = await ApiHelper().getAPI(
+        "/api/admin/documents/$id/verify",
+      );
+      print("======================document : $response");
+      if (response["success"] != true) {
+        emit(LoginFailure(_apiMessage(response)));
+        return;
+      }
+
+    } catch (e) {
+      emit(LoginFailure("stateError:${"errorMessage".tr()}"));
+    }
+  }
   Future<void> getState() async {
     try {
       var response = await ApiHelper().getAPI(
         "${Endpoint.appURL}${AppData.user.applicationId}/${Endpoint.status}",
       );
-      print("======================Profile : $response");
+      print("======================state : $response");
       if (response["success"] != true) {
         emit(LoginFailure(_apiMessage(response)));
         return;
       }
       AppData.user.state = response["data"]["status"];
+      AppData.user.rejectReason = response["data"]["rejectReason"]?? "";
     } catch (e) {
       emit(LoginFailure("stateError:${"errorMessage".tr()}"));
     }
@@ -121,35 +171,14 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginFailure(_apiMessage(response)));
         return;
       }
+      print("======================profile : $response");
 
       var data = response["data"];
 
-      AppData.user.nationalID = data["nationalId"];
-      AppData.user.id = data["id"];
-      AppData.user.gender = data["gender"];
-      AppData.user.dateOfBirth = data["dateOfBirth"];
-      AppData.user.city = data["governorate"];
-      AppData.user.address = data["address"];
-      AppData.user.birthCity = data["placeOfBirth"];
-      AppData.user.nationality = data["nationality"];
+     if(data != null && data != []) AppData.user.getPersonalInfo(data);
     } catch (e) {
       emit(LoginFailure("profileError:${"errorMessage".tr()}"));
     }
   }
 
-  Future<void> getNotifications() async {
-    try {
-      var response = await ApiHelper().getAPI(
-        "${Endpoint.my}${Endpoint.notifications}",
-      );
-      print("======================Profile : $response");
-
-      if (response["success"] != true) {
-        emit(LoginFailure(_apiMessage(response)));
-        return;
-      }
-    } catch (e) {
-      emit(LoginFailure("notificationsError:${"errorMessage".tr()}"));
-    }
-  }
 }

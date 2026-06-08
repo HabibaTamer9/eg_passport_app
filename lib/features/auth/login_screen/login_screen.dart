@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eg_passport_app/core/theme/app_colors.dart';
 import 'package:eg_passport_app/features/auth/document_upload/document_upload.dart';
 import 'package:eg_passport_app/features/auth/login_screen/login_cubit/login_cubit.dart';
 import 'package:eg_passport_app/features/auth/login_screen/login_cubit/login_state.dart';
@@ -66,50 +67,41 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: BlocProvider(
         create: (context) => LoginCubit(),
-        child:  BlocConsumer<LoginCubit, LoginState>(
+        child: BlocConsumer<LoginCubit, LoginState>(
           listener: (context, state) {
             if (state is LoginLoading) {
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => const Center(
-                  child: CircularProgressIndicator(),
+                builder: (_) => Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryRedColor,
+                  ),
                 ),
               );
             }
-
             if (state is LoginFailure) {
-              Navigator.pop(context); // يقفل اللودينج
+              Navigator.pop(context);
 
-              _showApiDialog(
-                title: 'error'.tr(),
-                message: state.error,
-              );
+              _showApiDialog(title: 'error'.tr(), message: state.error);
             }
-
             if (state is LoginSuccess) {
               Navigator.pop(context); // يقفل اللودينج
 
               if (AppData.user.nationalID == null) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => PersonalInfoScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => PersonalInfoScreen()),
                 );
               } else if (AppData.user.documents!.isEmpty) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => DocumentUploadScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => DocumentUploadScreen()),
                 );
               } else {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => MainScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => MainScreen()),
                 );
               }
             }
@@ -123,19 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text(
                         'login'.tr(),
-                        style: TextStyle(
-                          color: Color(0xff111827),
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Text(
                         'welcome_back'.tr(),
-                        style: TextStyle(
-                          color: Color(0xff6B7280),
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       CustomTextFormField(
                         hinticon: Icons.person,
@@ -198,11 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               Text(
                                 'remember_me'.tr(),
-                                style: TextStyle(
-                                  color: Color(0xff6B7280),
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
                           ),
@@ -217,11 +197,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             child: Text(
                               'forget_password'.tr(),
-                              style: TextStyle(
-                                color: Color(0xffB21A1A),
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium!
+                                  .copyWith(color: AppColors.primaryRedColor),
                             ),
                           ),
                         ],
@@ -252,11 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           Text(
                             'continue'.tr(),
-                            style: TextStyle(
-                              color: Color(0xff6B7280),
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
                           ),
 
                           Expanded(
@@ -275,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Container(
                               height: 60.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(10.0),
                                 border: Border.all(
                                   color: Colors.grey.shade400,
@@ -287,17 +260,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   Icon(
                                     Icons.fingerprint,
-                                    color: Color(0xffB21A1A),
+                                    color: AppColors.primaryRedColor,
                                     size: 30.sp,
                                   ),
                                   SizedBox(width: 10.w),
                                   Text(
                                     'fingerprint'.tr(),
-                                    style: TextStyle(
-                                      color: Color(0xff6B7280),
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: Theme.of(context).textTheme.titleMedium
                                   ),
                                 ],
                               ),
@@ -308,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Container(
                               height: 60.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(10.0),
                                 border: Border.all(
                                   color: Colors.grey.shade400,
@@ -320,17 +289,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   Icon(
                                     Icons.face_6,
-                                    color: Color(0xffB21A1A),
+                                    color: AppColors.primaryRedColor,
                                     size: 30.sp,
                                   ),
                                   SizedBox(width: 10.w),
                                   Text(
                                     'Faceprint'.tr(),
-                                    style: TextStyle(
-                                      color: Color(0xff6B7280),
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: Theme.of(context).textTheme.titleMedium
                                   ),
                                 ],
                               ),
@@ -341,11 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 10.h),
                       Text(
                         'don\'t_have_account'.tr(),
-                        style: TextStyle(
-                          color: Color(0xff6B7280),
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
                       ),
                       TextButton(
                         onPressed: () {
@@ -358,11 +319,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text(
                           'register'.tr(),
-                          style: TextStyle(
-                            color: Color(0xffB21A1A),
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
                         ),
                       ),
                       SizedBox(

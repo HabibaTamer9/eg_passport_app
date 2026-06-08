@@ -1,8 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eg_passport_app/features/digital_passport/digital_passport_screen.dart';
+import 'package:eg_passport_app/features/documents/presentation/documents_management_screen.dart';
+import 'package:eg_passport_app/features/home/view/digital_passport.dart';
+import 'package:eg_passport_app/features/notification_screen/notification_ui.dart';
+import 'package:eg_passport_app/features/requests/presentation/my_requests_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../home_screen/home_screen.dart';
+import '../profile/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,10 +21,11 @@ class _MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
   List<Widget> pages = [
     HomeScreen(),
-    Center(child: Text("passport".tr())),
-    Center(child: Text("document".tr())),
-    Center(child: Text("notification".tr())),
-    Center(child: Text("profile".tr())),
+    DigitalPassportScreen(),
+    DocumentsManagementScreen(),
+    MyRequestsScreen(),
+    NotificationUi(),
+    ProfileScreen(),
   ];
 
   @override
@@ -32,6 +39,8 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: Color(0xfFFAFAFA),
       appBar: AppBar(
         toolbarHeight: 70,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         elevation: 0,
         backgroundColor: Colors.white,
         title: Column(
@@ -86,14 +95,15 @@ class _MainScreenState extends State<MainScreen> {
         selectedItemColor: Color(0xffB21A1A),
         unselectedItemColor: Color(0xff44474E),
         showUnselectedLabels: true,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500,fontSize: 12.sp),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500,fontSize: 12.sp),
-        iconSize: 25.sp,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500,fontSize: 10.sp),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500,fontSize: 10.sp),
+        iconSize: 20.sp,
 
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'.tr()),
           BottomNavigationBarItem(icon: Icon(Icons.contact_mail_outlined), label: 'passport'.tr()),
-          BottomNavigationBarItem(icon: Icon(Icons.article_outlined), label: 'document'.tr()),
+          BottomNavigationBarItem(icon: Icon(Icons.folder_copy_outlined), label: 'document'.tr()),
+          BottomNavigationBarItem(icon: Icon(Icons.article_outlined), label: 'requests'.tr()),
           BottomNavigationBarItem(icon: Icon(Icons.notifications_none), label: 'notification'.tr()),
           BottomNavigationBarItem(icon: Icon(Icons.person_outlined), label: 'profile'.tr()),
         ],

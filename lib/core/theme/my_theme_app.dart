@@ -6,26 +6,22 @@ import 'app_colors.dart';
 
 class MyThemeApp {
   static ThemeData lightTheme = ThemeData(
-
-      //fontFamily: 'Cairo',
+    scaffoldBackgroundColor: AppColors.whiteColor,
+      cardColor: AppColors.whiteColor,
     textTheme: TextTheme(
-      //textLarge
       titleLarge: TextStyle(
           fontSize: 18.sp,
-        color: AppColors.blackColor,
+        color: AppColors.lightTextColor,
         fontFamily: "Cairo",
         fontWeight: FontWeight.w700,
-
       ),
-      //titleMeduim
       titleMedium: TextStyle(
         fontSize: 15.sp,
         color: AppColors.greyColor,
         fontFamily: "Cairo",
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
       ),
       bodyLarge: TextStyle(
-        // fontWeight: FontWeight.bold,
         fontSize: 16.sp,
         color: AppColors.blackColor,
         fontFamily: "Cairo",
@@ -33,7 +29,6 @@ class MyThemeApp {
 
       ),
       bodyMedium: TextStyle(
-        // fontWeight: FontWeight.bold,
           fontSize: 14.sp,
           color: AppColors.blackColor,
         fontFamily: "Cairo",
@@ -46,27 +41,6 @@ class MyThemeApp {
         fontFamily: "Cairo",
         fontWeight: FontWeight.w400,
       ),
-      /*
-      //textMeduim
-      bodyMedium: TextStyle(
-       // fontWeight: FontWeight.bold,
-        fontSize: 20,
-        color: AppColors.whiteColor
-      ),
-      //textSmall
-
-
-
-      //titleSmall
-      titleSmall: TextStyle(
-      )
-
-*/
-
     )
-
-
   );
-
-
 }

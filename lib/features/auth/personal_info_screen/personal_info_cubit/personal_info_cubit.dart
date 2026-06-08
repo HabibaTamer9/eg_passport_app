@@ -18,17 +18,6 @@ class PersonalInfoCubit extends Cubit<PersonalInfoState> {
     return response[messageLanguage] ?? "حدث خطأ غير متوقع";
   }
 
-  void getUser(var data) {
-    AppData.user.nationalID = data["nationalId"];
-    AppData.user.id = data["id"];
-    AppData.user.gender = data["gender"];
-    AppData.user.dateOfBirth = data["dateOfBirth"];
-    AppData.user.city = data["governorate"];
-    AppData.user.address = data["address"];
-    AppData.user.birthCity = data["placeOfBirth"];
-    AppData.user.nationality = data["nationality"];
-  }
-
   Future<void> getProfile() async {
     try {
       var response = await ApiHelper().getAPI(Endpoint.meProfile);
@@ -39,7 +28,7 @@ class PersonalInfoCubit extends Cubit<PersonalInfoState> {
 
       var data = response["data"];
 
-      getUser(data);
+      AppData.user.getPersonalInfo(data);
     } catch (e) {
       emit(PersonalInfoFailure("errorMessage".tr()));
     }

@@ -68,13 +68,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             if (state is ForgotPasswordLoading) {
               showDialog(
                 context: context,
-                builder: (context) => Center(child: CircularProgressIndicator()),
+                builder: (context) =>
+                    Center(child: CircularProgressIndicator()),
               );
             }
             if (state is ForgotPasswordFailure) {
               errorText = state.error;
-              setState(() {
-              });
+              setState(() {});
             }
             if (state is ForgotPasswordCode) {
               pageController.nextPage(
@@ -91,7 +91,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             if (state is ResetPasswordLoading) {
               showDialog(
                 context: context,
-                builder: (context) => Center(child: CircularProgressIndicator()),
+                builder: (context) =>
+                    Center(child: CircularProgressIndicator()),
               );
             }
             if (state is ResetPasswordSuccess) {
@@ -127,7 +128,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           },
                         ),
                         CustomButton(
-                          textName: "Send code",
+                          textName: 'send_code'.tr(),
                           onPressed: () {
                             cubit.forgotPassword(controller.text);
                           },
@@ -139,7 +140,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.sms_outlined, size: 70),
-                      Text("Enter the code sent to your email or phone number"),
+                      Text('enter_code'.tr()),
                       const SizedBox(height: 15),
                       Pinput(
                         keyboardType: TextInputType.number,
@@ -171,11 +172,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                   Column(
                     children: [
-                      Text("New Password"),
+                      Text(
+                        'enter_new_password'.tr(),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 15),
                       CustomTextFormField(
-                        title: 'كلمة المرور',
-                        hint: 'ادخل كلمة المرور',
+                        title: 'password'.tr(),
+                        hint: 'password_hint'.tr(),
                         controller: passwordController,
                         hinticon: Icons.lock,
                         isRequired: true,
@@ -183,19 +190,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         keyboardType: TextInputType.visiblePassword,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return " من فضلك ادخل كلمة المرور";
+                            return 'password_required'.tr();
                           }
                           if (value.length < 8) {
-                            return "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+                            return 'password_error_1'.tr();
                           }
                           if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                            return "كلمة المرور يجب أن تحتوي على حرف كبير";
+                            return 'password_error_2'.tr();
                           }
                           if (!RegExp(r'[0-9]').hasMatch(value)) {
-                            return "كلمة المرور يجب أن تحتوي على رقم";
+                            return 'password_error_3'.tr();
                           }
                           if (!RegExp(r'[^A-Za-z0-9]').hasMatch(value)) {
-                            return "كلمة المرور يجب أن تحتوي على رمز خاص مثل @";
+                            return 'password_error_4'.tr();
                           }
                           return null;
                         },
@@ -204,8 +211,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       const SizedBox(height: 2),
 
                       CustomTextFormField(
-                        title: 'تاكيد كلمة المرور',
-                        hint: 'اعد ادخال كلمة المرور',
+                        title: 'confirm_password'.tr(),
+                        hint: 'confirm_password_hint'.tr(),
                         controller: confirmPasswordController,
                         hinticon: Icons.lock,
                         isRequired: true,
@@ -213,10 +220,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         keyboardType: TextInputType.visiblePassword,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return " من فضلك ادخل كلمة المرور";
+                            return 'confirm_password_required'.tr();
                           }
                           if (value != passwordController.text) {
-                            return "كلمة المرور غير متطابقة";
+                            return 'confirm_password_error'.tr();
                           }
                           return null;
                         },
@@ -224,7 +231,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       const SizedBox(height: 3),
 
                       CustomButton(
-                        textName: "Reset Password",
+                        textName: 'reset_password'.tr(),
                         onPressed: () {
                           cubit.resetPassword(
                             controller.text,
@@ -238,7 +245,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ],
               ),
             );
-          }
+          },
         ),
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/core/customs/custom_button.dart';
 import 'package:eg_passport_app/core/theme/app_colors.dart';
 import 'package:eg_passport_app/features/auth/widgets/background.dart';
@@ -70,7 +71,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
             if (state is OtpLocked) {
               errorText =
-                  "Too many attempts. Try again after ${state.lockMinutes} minutes";
+                  "${'otp_error'.tr()} ${state.lockMinutes} ${'minutes'.tr()}";
             }
             if (state is OtpSuccess) {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()));
@@ -85,8 +86,8 @@ class _OtpScreenState extends State<OtpScreen> {
 
                   const SizedBox(height: 20),
 
-                  const Text(
-                    "Enter Verification Code",
+                  Text(
+                    'otp_code'.tr(),
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -95,8 +96,8 @@ class _OtpScreenState extends State<OtpScreen> {
 
                   const SizedBox(height: 10),
 
-                  const Text(
-                    "Enter the 6-digit code sent to your mobile number",
+                   Text(
+                    'otp_desc'.tr(),
                     textAlign: TextAlign.center,
                   ),
 
@@ -213,7 +214,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       width: double.infinity,
                       height: 55,
                       child: CustomButton(
-                        textName: "Verify",
+                        textName: 'otp_verify'.tr(),
                         onPressed: () {
                           cubit.verifyOtp();
                         },
@@ -232,7 +233,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             cubit.resendOtp();
                           }
                         : null,
-                    child: Text("Resend OTP" , style: TextStyle(
+                    child: Text('otp_resend'.tr() , style: TextStyle(
                       color: AppColors.primaryRedColor
                     )
                         ),

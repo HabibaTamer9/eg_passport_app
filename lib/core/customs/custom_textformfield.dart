@@ -67,8 +67,6 @@ class CustomTextFormField extends StatelessWidget {
             validator: validator,
             obscureText: obscureText,
             keyboardType: keyboardType,
-
-            textDirection: TextDirection.rtl,
             textAlign: TextAlign.start,
             maxLength: maxLength,
             onTap: onTap,

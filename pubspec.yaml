@@ -41,6 +41,8 @@ dependencies:
   file_picker: ^8.3.7
   pinput: ^6.0.2
   flutter_bloc: ^9.1.1
+  image_picker: ^1.2.2
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

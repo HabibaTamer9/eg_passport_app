@@ -9,14 +9,18 @@ class HomeScreen extends StatelessWidget {
 
   int currentIndex = 1;
 
-  final List<String> state = [
-    "تم استلام الطلب",
-    "جاري التحقق",
-    "تمت الموافقة",
-    "تم الاصدار",
+  List<String> state = [
+    'request',
+    'under_review',
+    'approved',
+    'request_done',
   ];
 
   Color getColor(int index) {
+    currentIndex = getState();
+    if(currentIndex == -1){
+      return AppColors.primaryRedColor;
+    }
     if (index == currentIndex) {
       return Color(0xffC09300);
     }
@@ -26,9 +30,52 @@ class HomeScreen extends StatelessWidget {
     return Colors.grey;
   }
 
+
+
+  int getState(){
+    var state = AppData.user.state;
+    if (state == "PendingReview"){
+      return 1;
+    }
+    if (state == "Approved"){
+      return 2;
+    }
+    if (state == "Rejected"){
+      return -1;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(AppData.user.profileImage);
+    print(AppData.user.state);
+    if(currentIndex == -1){
+      return Scaffold(
+        body: Column(
+          children: [
+            Icon(Icons.error_outline , color: AppColors.primaryRedColor , size: 50.sp,),
+            SizedBox(height: 10.h),
+            Text(
+              'error'.tr(),
+              style: TextStyle(
+                color: AppColors.primaryRedColor,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              AppData.user.rejectReason!,
+              style: TextStyle(
+                color: AppColors.greyColor,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(10.0.sp),
@@ -40,7 +87,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage(AppData.user.profileImage!),
+                  backgroundImage: NetworkImage("https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"),
                 ),
                 SizedBox(width: 10.w),
                 Column(
@@ -68,7 +115,6 @@ class HomeScreen extends StatelessWidget {
             ),
             Container(
               width: 360.w,
-              height: 302.h,
               margin: EdgeInsets.symmetric(vertical: 15.sp),
               padding: EdgeInsets.all(15.sp),
               decoration: BoxDecoration(
@@ -126,7 +172,7 @@ class HomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15.r),
                           color: Color(0xffC09300),
                         ),
-                        width: 88.w,
+                        padding: EdgeInsets.all(5),
                         height: 30.h,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -138,7 +184,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(width: 5.w),
                             Text(
-                              "قيد المراجعه",
+                              'under_review'.tr(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12.sp,
@@ -162,7 +208,7 @@ class HomeScreen extends StatelessWidget {
                           border: Border.all(color: Color(0xff44474E)),
                           borderRadius: BorderRadius.circular(12.r),
                           image: DecorationImage(
-                            image: NetworkImage(AppData.user.profileImage!),
+                            image: NetworkImage("https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"),
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -171,12 +217,15 @@ class HomeScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            AppData.user.name,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
+                          SizedBox(
+                            width: 120.w,
+                            child: Text(
+                              AppData.user.name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           Text(
@@ -197,19 +246,22 @@ class HomeScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 15.h),
                           Text(
-                            "رقم الطلب",
+                            'app_number'.tr(),
                             style: TextStyle(
                               color: AppColors.lightGreyColor,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(
-                            AppData.user.appNumber!,
-                            style: TextStyle(
-                              color: Color(0xffC09300),
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
+                          SizedBox(
+                            width: 120.w,
+                            child: Text(
+                              AppData.user.appNumber!,
+                              style: TextStyle(
+                                color: Color(0xffC09300),
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -226,14 +278,14 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 25.h),
+                  SizedBox(height: 15.h),
                   Divider(thickness: 1, color: AppColors.greyColor),
                   SizedBox(height: 15.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "سينتهي خلال 2:25",
+                        "${'expire'.tr()} 2:25",
                         style: TextStyle(
                           color: AppColors.greyColor,
                           fontSize: 12.sp,
@@ -249,7 +301,7 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             Icon(Icons.refresh, color: Colors.white),
                             Text(
-                              "تحديث رمز QR",
+                              'refresh'.tr(),
                               style: TextStyle(
                                 color: AppColors.whiteColor,
                                 fontSize: 12.sp,
@@ -269,7 +321,7 @@ class HomeScreen extends StatelessWidget {
                 vertical: 10.h,
                 horizontal: 5.w,
               ),
-              padding: EdgeInsetsGeometry.symmetric(vertical: 10.h),
+              padding: EdgeInsetsGeometry.only(top: 10.h),
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
                 borderRadius: BorderRadius.circular(16.r),
@@ -283,12 +335,11 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               width: 360.w,
-              height: 155.h,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "حالة الطلب",
+                    'request_state'.tr(),
                     style: TextStyle(
                       color: Color(0xff44474E),
                       fontSize: 20.sp,
@@ -297,7 +348,6 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(
                     height: 100.h,
-                    width: 300.w,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
@@ -324,7 +374,7 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  state[index],
+                                  state[index].tr(),
                                   style: TextStyle(
                                     color: getColor(index),
                                     fontSize: 10.sp,
@@ -353,7 +403,7 @@ class HomeScreen extends StatelessWidget {
             ),
 
             Text(
-              "اجراءات سريعه",
+              'fast_procedures'.tr(),
               style: TextStyle(
                 color: Color(0xff002147),
                 fontSize: 20.sp,
@@ -401,7 +451,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "التفاصيل",
+                      'details'.tr(),
                       style: TextStyle(
                         color: Color(0xff002147),
                         fontSize: 12.sp,
@@ -423,7 +473,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "تحميل pdf",
+                      'download_pdf'.tr(),
                       style: TextStyle(
                         color: Color(0xff002147),
                         fontSize: 12.sp,
@@ -445,7 +495,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "مساعده",
+                      'help'.tr(),
                       style: TextStyle(
                         color: Color(0xff002147),
                         fontSize: 12.sp,

@@ -73,24 +73,39 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return Scaffold(
       body: BlocProvider(
         create: (context) => PersonalInfoCubit(),
-        child: BlocBuilder<PersonalInfoCubit, PersonalInfoState>(
-          builder: (context, state) {
+        child: BlocConsumer<PersonalInfoCubit, PersonalInfoState>(
+          listener: (context, state) {
             if (state is PersonalInfoLoading) {
               showDialog(
                 context: context,
-                builder: (context) => Center(child: CircularProgressIndicator()),
+                barrierDismissible: false,
+                builder: (_) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
             }
+
             if (state is PersonalInfoFailure) {
-              _showApiDialog(title: 'error'.tr(), message: state.error);
+              Navigator.pop(context); // اقفل اللودينج
+
+              _showApiDialog(
+                title: 'error'.tr(),
+                message: state.error,
+              );
             }
+
             if (state is PersonalInfoSuccess) {
-              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.pop(context); // اقفل اللودينج
+
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DocumentUploadScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const DocumentUploadScreen(),
+                ),
               );
             }
+          },
+          builder: (context, state) {
             return Background(
               currentIndex: 1,
               child: SingleChildScrollView(

@@ -115,14 +115,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       _saveAuthTokens(response);
       await _showApiDialog(
-        title: "تم",
+        title: 'done'.tr(),
         message: response[messageLanguage] ?? "تم إنشاء الحساب بنجاح",
       );
       uId = response["data"]["userId"];
       getUser(response);
 
       if (!mounted) return;
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => PersonalInfoScreen()),
       );
@@ -166,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // title
                 Text(
-                  "انشاء حساب جديد",
+                  'register'.tr(),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
 
@@ -174,7 +174,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // subtitle
                 Text(
-                  "انضم الي منصة الهوية الرقمية الذكية",
+                  'join'.tr(),
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
 
@@ -184,15 +184,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     children: [
                       CustomTextFormField(
-                        title: 'الاسم الكامل',
-                        hint: 'ادخل اسمك رباعي',
+                        title: 'full_name'.tr(),
+                        hint: 'full_name_hint'.tr(),
                         isRequired: true,
                         controller: nameController,
                         hinticon: Icons.person_2_outlined,
                         keyboardType: TextInputType.name,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return " من فضلك ادخل الاسم";
+                            return 'full_name_required'.tr();
                           }
                           return null;
                         },
@@ -201,18 +201,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 2),
 
                       CustomTextFormField(
-                        title: 'البريد الإلكتروني',
-                        hint: 'ادخل البريد الإلكتروني',
+                        title: 'user_email'.tr(),
+                        hint: 'user_email_hint'.tr(),
                         isRequired: true,
                         controller: emailController,
                         hinticon: Icons.email,
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "ادخل البريد الإلكتروني";
+                            return 'email_required'.tr();
                           }
                           if (!value.contains("@")) {
-                            return "البريد الإلكتروني غير صحيح";
+                            return 'user_email_error'.tr();
                           }
                           return null;
                         },
@@ -221,18 +221,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 2),
 
                       CustomTextFormField(
-                        title: 'رقم الهاتف المحمول',
-                        hint: 'ادخل رقم الهاتف المحمول',
+                        title: 'phone_number'.tr(),
+                        hint: 'phone_number_hint'.tr(),
                         isRequired: true,
                         controller: phoneController,
                         hinticon: Icons.phone,
                         keyboardType: TextInputType.phone,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return " من فضلك ادخل رقم الهاتف";
+                            return 'phone_number_required'.tr();
                           }
                           if (value.length != 11) {
-                            return "لرقم الهاتف يجب أن يكون 11 رقم";
+                            return 'phone_number_error'.tr();
                           }
                           return null;
                         },
@@ -241,8 +241,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 2),
 
                       CustomTextFormField(
-                        title: 'كلمة المرور',
-                        hint: 'ادخل كلمة المرور',
+                        title: 'password'.tr(),
+                        hint: 'password_hint'.tr(),
                         controller: passwordController,
                         hinticon: Icons.lock,
                         isRequired: true,
@@ -250,19 +250,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         keyboardType: TextInputType.visiblePassword,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return " من فضلك ادخل كلمة المرور";
+                            return 'password_required'.tr();
                           }
                           if (value.length < 8) {
-                            return "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+                            return 'password_error_1'.tr();
                           }
                           if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                            return "كلمة المرور يجب أن تحتوي على حرف كبير";
+                            return 'password_error_2'.tr();
                           }
                           if (!RegExp(r'[0-9]').hasMatch(value)) {
-                            return "كلمة المرور يجب أن تحتوي على رقم";
+                            return 'password_error_3'.tr();
                           }
                           if (!RegExp(r'[^A-Za-z0-9]').hasMatch(value)) {
-                            return "كلمة المرور يجب أن تحتوي على رمز خاص مثل @";
+                            return 'password_error_4'.tr();
                           }
                           return null;
                         },
@@ -271,8 +271,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 2),
 
                       CustomTextFormField(
-                        title: 'تاكيد كلمة المرور',
-                        hint: 'اعد ادخال كلمة المرور',
+                        title: 'confirm_password'.tr(),
+                        hint: 'confirm_password_hint'.tr(),
                         controller: confirmPasswordController,
                         hinticon: Icons.lock,
                         isRequired: true,
@@ -280,10 +280,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         keyboardType: TextInputType.visiblePassword,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return " من فضلك ادخل كلمة المرور";
+                            return 'confirm_password_required'.tr();
                           }
                           if (value != passwordController.text) {
-                            return "كلمة المرور غير متطابقة";
+                            return 'confirm_password_error'.tr();
                           }
                           return null;
                         },
@@ -313,7 +313,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'أوافق على ',
+                                      text: 'confirm'.tr(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium
@@ -323,7 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
 
                                     TextSpan(
-                                      text: "الشروط والاحكام وسياسه الخصوصية",
+                                      text: 'policy'.tr(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium
@@ -349,13 +349,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   width: double.infinity,
                   height: 52,
                   child: CustomButton(
-                    textName: "انشاء حساب",
+                    textName: 'register'.tr(),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         if (!isChecked) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("يجب الموافقة على الشروط والأحكام"),
+                             SnackBar(
+                              content: Text('policy_error'.tr(),)
                             ),
                           );
                           return;
@@ -376,7 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     Text(
-                      " لديك حساب بالفعل ؟  ",
+                      'have_account'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     Expanded(
@@ -392,7 +392,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   width: double.infinity,
                   height: 52,
                   child: CustomButton(
-                    textName: "تسجيل دخول",
+                    textName: 'login'.tr(),
                     textColor: AppColors.blackColor,
                     onPressed: () {
                       Navigator.pushReplacement(

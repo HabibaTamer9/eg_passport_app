@@ -17,12 +17,10 @@ class AppData {
     final dateStr = date.toString().trim();
 
     if (dateStr.isEmpty) return '';
-
     // نجرب DateTime.parse الأول
     try {
       final date = DateTime.parse(dateStr);
-      print("${DateFormat('dd MMMM yyyy').format(date)}");
-      return DateFormat('dd MMMM yyyy').format(date);
+      return DateFormat('dd, MMM yyyy').format(date);
     } catch (_) {}
 
     final formats = [
@@ -35,7 +33,7 @@ class AppData {
     for (final format in formats) {
       try {
         final parsedDate = DateFormat(format).parse(date);
-        return DateFormat('dd MMMM yyyy').format(parsedDate);
+        return DateFormat('dd, MMM yyyy').format(parsedDate);
       } catch (_) {}
     }
 

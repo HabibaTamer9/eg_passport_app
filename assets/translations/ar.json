@@ -110,6 +110,14 @@
   "release_date": "تاريخ الاصدار",
 
   "document" : "المستندات",
+  "ProfilePhoto": "الصوره الشخصيه",
+  "BirthCertificate": "شهادة الميلاد" ,
+  "NationalIdBack": "بطاقة الرقم القومي (خلف)",
+  "NationalIdFront": "بطاقة الرقم القومي",
+  "PreviousPassport": "جواز السفر السابق",
+  "AcademicCertificate": "شهادة المؤهل الدراسي",
+  "ProofOfResidence": "إثبات محل الإقامة",
+
   "requests": "طلباتي",
   "notification" : "الاشعارات",
 

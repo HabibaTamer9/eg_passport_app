@@ -1,3 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:eg_passport_app/core/Api/endpoint.dart';
+import 'package:eg_passport_app/core/theme/app_colors.dart';
 import 'package:eg_passport_app/features/documents/data/passport_document.dart';
 import 'package:eg_passport_app/features/documents/presentation/widgets/document_status_badge.dart';
 import 'package:eg_passport_app/features/documents/presentation/widgets/document_upload_progress.dart';
@@ -23,27 +26,6 @@ class DocumentCard extends StatelessWidget {
   final int uploadProgress;
   final VoidCallback onUpload;
   final VoidCallback? onReplace;
-
-  String get _displayTitle {
-    switch (document.documentType) {
-      case "ProfilePhoto":
-        return "صورة شخصية";
-      case "NationalIdFront":
-        return "بطاقة الرقم القومي (أمام)";
-      case "NationalIdBack":
-        return "بطاقة الرقم القومي (خلف)";
-      case "BirthCertificate":
-        return "شهادة الميلاد";
-      case "PreviousPassport":
-        return "جواز السفر السابق";
-      case "AcademicCertificate":
-        return "شهادة المؤهل الدراسي";
-      case "ProofOfResidence":
-        return "إثبات محل الإقامة";
-      default:
-        return "مستند إضافي";
-    }
-  }
 
   PassportDocumentKind get _kind {
     switch (document.documentType) {
@@ -74,7 +56,7 @@ class DocumentCard extends StatelessWidget {
     if (compact) {
       return _DocumentMobileTile(
         document: document,
-        title: _displayTitle,
+        title: document.documentType.tr(),
         kind: _kind,
         uploading: uploading,
         uploadProgress: uploadProgress,
@@ -100,7 +82,7 @@ class DocumentCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  _displayTitle,
+                  document.documentType.tr(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
@@ -118,7 +100,14 @@ class DocumentCard extends StatelessWidget {
             child: DocumentStatusBadge(status: document.status),
           ),
           const SizedBox(height: 12),
-          Expanded(child: DocumentPreview(kind: _kind)),
+          Expanded(child: Container(
+            decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: EPassportColors.border),
+                image: DecorationImage(image: NetworkImage("${Endpoint.baseURL}${document.fileUrl}"))
+            ),
+          ),),
           const SizedBox(height: 12),
           Text(
             _hasUploadedFile ? 'تم الرفع' : 'لم يتم رفع مستند',
@@ -159,52 +148,59 @@ class DocumentCard extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: EPassportColors.surface,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            title: Text(
-              _displayTitle,
+        return AlertDialog(
+          backgroundColor: EPassportColors.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Center(
+            child: Text(
+              document.documentType.tr(),
               textAlign: TextAlign.right,
               style: EPassportTextStyles.title(16),
             ),
-            content: SizedBox(
-              width: 280,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: 180,
-                    child: DocumentPreview(kind: _kind),
-                  ),
-                  const SizedBox(height: 12),
-                  DocumentStatusBadge(status: document.status),
-                  if (_hasUploadedFile) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      'تاريخ الرفع: ${document.uploadedAt ?? "غير متوفر"}',
-                      textAlign: TextAlign.right,
-                      style: EPassportTextStyles.body(
-                        size: 12,
-                        color: EPassportColors.muted,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actionsAlignment: MainAxisAlignment.start,
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('إغلاق'),
-              ),
-            ],
           ),
+          content: SizedBox(
+            width: 280,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: 180,
+                  child: Container(
+                    width: 70,
+                    height: 86,
+                    decoration: BoxDecoration(
+                        color: AppColors.whiteColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: EPassportColors.border),
+                        image: DecorationImage(image: NetworkImage("${Endpoint.baseURL}${document.fileUrl}"))
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DocumentStatusBadge(status: document.status),
+                if (_hasUploadedFile) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'تاريخ الرفع: ${document.uploadedAt ?? "غير متوفر"}',
+                    style: EPassportTextStyles.body(
+                      size: 12,
+                      color: EPassportColors.muted,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.start,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إغلاق'),
+            ),
+          ],
         );
       },
     );
@@ -323,11 +319,25 @@ class _DocumentMobileTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _DocumentOptionsButton(onSelected: onOptions),
-          const SizedBox(width: 8),
+          SizedBox(
+            width: 58,
+            height: 58,
+            child: Container(
+              width: 70,
+              height: 86,
+              decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: EPassportColors.border),
+                  image: DecorationImage(image: NetworkImage("${Endpoint.baseURL}${document.fileUrl}"))
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -368,11 +378,7 @@ class _DocumentMobileTile extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          SizedBox(
-            width: 58,
-            height: 58,
-            child: DocumentPreview(kind: kind),
-          ),
+          _DocumentOptionsButton(onSelected: onOptions),
         ],
       ),
     );
@@ -431,222 +437,4 @@ class _DocumentActionButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class DocumentPreview extends StatelessWidget {
-  const DocumentPreview({super.key, required this.kind});
-
-  final PassportDocumentKind kind;
-
-  @override
-  Widget build(BuildContext context) {
-    switch (kind) {
-      case PassportDocumentKind.personalPhoto:
-        return const _PhotoPreview();
-      case PassportDocumentKind.nationalIdFront:
-        return const _NationalIdPreview(front: true);
-      case PassportDocumentKind.nationalIdBack:
-        return const _NationalIdPreview(front: false);
-      case PassportDocumentKind.birthCertificate:
-        return const _PaperPreview(
-          accent: Color(0xFFD8C3A5),
-          icon: Icons.article_outlined,
-        );
-      case PassportDocumentKind.previousPassport:
-        return const _PassportPreview();
-      case PassportDocumentKind.academicCertificate:
-        return const _PaperPreview(
-          accent: Color(0xFFCBB895),
-          icon: Icons.school_outlined,
-        );
-      case PassportDocumentKind.proofOfResidence:
-        return const _PaperPreview(
-          accent: Color(0xFF9BB7D4),
-          icon: Icons.home_work_outlined,
-        );
-      case PassportDocumentKind.extraDocuments:
-        return const _EmptyDocumentPreview();
-    }
-  }
-}
-
-class _PhotoPreview extends StatelessWidget {
-  const _PhotoPreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: _previewDecoration(const Color(0xFFE6EEF7)),
-      child: Center(
-        child: Container(
-          width: 70,
-          height: 86,
-          decoration: BoxDecoration(
-            color: const Color(0xFFD7E4F1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF344B63),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person_rounded, color: Colors.white),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NationalIdPreview extends StatelessWidget {
-  const _NationalIdPreview({required this.front});
-
-  final bool front;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: _previewDecoration(const Color(0xFFF2E7D7)),
-      child: Center(
-        child: front ? _frontFace() : _backFace(),
-      ),
-    );
-  }
-
-  Widget _frontFace() {
-    return const Icon(
-      Icons.contact_mail_outlined,
-      size: 25,
-      color: EPassportColors.officialBlue,
-    );
-  }
-
-  Widget _backFace() {
-    return const Icon(
-      Icons.credit_card,
-      size: 25,
-      color: EPassportColors.officialBlue,
-    );
-  }
-}
-
-class _PaperPreview extends StatelessWidget {
-  const _PaperPreview({required this.accent, required this.icon});
-
-  final Color accent;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: _previewDecoration(const Color(0xFFF8F7F4)),
-      child: Center(
-        child: Container(
-          width: 82,
-          height: 100,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: const Color(0xFFD5D0C7)),
-          ),
-          child: Icon(icon, color: accent, size: 22),
-        ),
-      ),
-    );
-  }
-}
-
-class _PassportPreview extends StatelessWidget {
-  const _PassportPreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: _previewDecoration(const Color(0xFFEFE8D7)),
-      child: Center(
-        child: Container(
-          width: 70,
-          height: 94,
-          decoration: BoxDecoration(
-            color: EPassportColors.darkBlue,
-            borderRadius: BorderRadius.circular(7),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.16),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.workspace_premium_rounded,
-                color: EPassportColors.gold,
-                size: 27,
-              ),
-              const SizedBox(height: 9),
-              Text(
-                'PASSPORT',
-                style: EPassportTextStyles.body(
-                  size: 8,
-                  color: EPassportColors.gold,
-                  weight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyDocumentPreview extends StatelessWidget {
-  const _EmptyDocumentPreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: _previewDecoration(const Color(0xFFF9FAFB)),
-      child: const Center(
-        child: Icon(
-          Icons.insert_drive_file_outlined,
-          color: EPassportColors.muted,
-          size: 42,
-        ),
-      ),
-    );
-  }
-}
-
-BoxDecoration _previewDecoration(Color color) {
-  return BoxDecoration(
-    color: color,
-    borderRadius: BorderRadius.circular(8),
-    border: Border.all(color: EPassportColors.border),
-  );
-}
-
-Widget _line(double widthFactor) {
-  return FractionallySizedBox(
-    alignment: Alignment.centerRight,
-    widthFactor: widthFactor,
-    child: Container(
-      height: 4,
-      decoration: BoxDecoration(
-        color: const Color(0xFFC9CED6),
-        borderRadius: BorderRadius.circular(999),
-      ),
-    ),
-  );
 }

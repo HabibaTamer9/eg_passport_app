@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eg_passport_app/core/Api/endpoint.dart';
 import 'package:eg_passport_app/core/data/app_data.dart';
+import 'package:eg_passport_app/core/models/document_model.dart';
+import 'package:eg_passport_app/core/models/user_model.dart';
 import 'package:eg_passport_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -38,7 +41,7 @@ class HomeScreen extends StatelessWidget {
       return 1;
     }
     if (state == "Approved"){
-      return 2;
+      return 3;
     }
     if (state == "Rejected"){
       return -1;
@@ -48,7 +51,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(AppData.user.state);
+    UserModel user = AppData.user;
     if(currentIndex == -1){
       return Scaffold(
         body: Column(
@@ -65,7 +68,7 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 10.h),
             Text(
-              AppData.user.rejectReason!,
+              user.rejectReason!,
               style: TextStyle(
                 color: AppColors.greyColor,
                 fontSize: 15.sp,
@@ -87,7 +90,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage("https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"),
+                  backgroundImage: NetworkImage("${Endpoint.baseURL}${user.profileImage}"),
                 ),
                 SizedBox(width: 10.w),
                 Column(
@@ -102,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      AppData.user.name,
+                      user.name,
                       style: TextStyle(
                         color: Color(0xff44474E),
                         fontSize: 20.sp,
@@ -208,7 +211,7 @@ class HomeScreen extends StatelessWidget {
                           border: Border.all(color: Color(0xff44474E)),
                           borderRadius: BorderRadius.circular(12.r),
                           image: DecorationImage(
-                            image: NetworkImage("https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"),
+                            image: NetworkImage("${Endpoint.baseURL}${user.profileImage}"),
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -220,7 +223,7 @@ class HomeScreen extends StatelessWidget {
                           SizedBox(
                             width: 120.w,
                             child: Text(
-                              AppData.user.name,
+                              user.name,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18.sp,
@@ -256,7 +259,7 @@ class HomeScreen extends StatelessWidget {
                           SizedBox(
                             width: 120.w,
                             child: Text(
-                              AppData.user.appNumber!,
+                              user.appNumber!,
                               style: TextStyle(
                                 color: Color(0xffC09300),
                                 fontSize: 15.sp,
@@ -403,108 +406,59 @@ class HomeScreen extends StatelessWidget {
             ),
 
             Text(
-              'fast_procedures'.tr(),
+              'document'.tr(),
               style: TextStyle(
                 color: Color(0xff002147),
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      width: 55.w,
-                      height: 55.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Icon(Icons.qr_code, size: 25.sp),
+            SizedBox(
+              height: 120.h,
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: user.documents?.length,
+                itemBuilder: (context, index) {
+                  DocumentModel document = user.documents![index];
+                  return Container(
+                    height: 120.h,
+                    margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+                    child: Column(
+                      children: [
+                        Badge(
+                          padding: EdgeInsets.all(2),
+                          backgroundColor: getColor(currentIndex),
+                          label: Icon(Icons.check, color: AppColors.whiteColor, size: 12.sp),
+                          child: Container(
+                            width: 60.w,
+                            height: 60.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(color: AppColors.lightGreyColor),
+                              image: DecorationImage(
+                                  image: NetworkImage("${Endpoint.baseURL}${document.fileUrl}"),
+                                  fit: BoxFit.contain,
+
+                                ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          document.documentType.tr(),
+                          style: TextStyle(
+                            color: Color(0xff002147),
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "QR",
-                      style: TextStyle(
-                        color: Color(0xff002147),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Container(
-                      width: 55.w,
-                      height: 55.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Icon(
-                        Icons.insert_drive_file_outlined,
-                        size: 25.sp,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'details'.tr(),
-                      style: TextStyle(
-                        color: Color(0xff002147),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Container(
-                      width: 55.w,
-                      height: 55.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Icon(Icons.download, size: 25.sp),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'download_pdf'.tr(),
-                      style: TextStyle(
-                        color: Color(0xff002147),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Container(
-                      width: 55.w,
-                      height: 55.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Icon(Icons.help, size: 25.sp),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'help'.tr(),
-                      style: TextStyle(
-                        color: Color(0xff002147),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  );
+                }
+              ),
             ),
           ],
         ),

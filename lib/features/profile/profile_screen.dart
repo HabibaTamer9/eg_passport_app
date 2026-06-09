@@ -7,6 +7,7 @@ import 'package:eg_passport_app/features/profile/widgets/setting_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/Api/endpoint.dart';
 import '../../core/models/passport_model.dart';
 import 'widgets/custom_container.dart';
 import '../../core/theme/app_colors.dart';
@@ -189,9 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               radius: 40,
                               backgroundImage: _imageFile != null
                                   ? FileImage(_imageFile!) as ImageProvider
-                                  : const NetworkImage(
-                                      "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png",
-                                    ),
+                                  : NetworkImage("${Endpoint.baseURL}${user.profileImage}")
                             ),
                           ),
                           Positioned(

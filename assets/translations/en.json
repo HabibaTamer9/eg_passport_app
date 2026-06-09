@@ -117,7 +117,15 @@
   "release_date": "Release Date",
 
 
-  "document" : "Document",
+  "document" : "Documents",
+  "ProfilePhoto": "Profile Photo",
+  "BirthCertificate": "Birth Certificate" ,
+  "NationalIdBack": "National ID Back",
+  "NationalIdFront": "National ID Front",
+  "PreviousPassport": "Previous Passport",
+  "AcademicCertificate": "Academic Certificate",
+  "ProofOfResidence": "Proof of Residence",
+
   "requests": "Requests",
   "notification" : "Notification",
 

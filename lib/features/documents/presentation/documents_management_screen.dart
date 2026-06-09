@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eg_passport_app/core/models/document_model.dart';
 import 'package:eg_passport_app/features/documents/cubit/documents_cubit.dart';
 import 'package:eg_passport_app/features/documents/cubit/documents_state.dart';
@@ -104,7 +105,7 @@ class _DocumentsContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'المستندات',
+          'document'.tr(),
           textAlign: TextAlign.center,
           style: EPassportTextStyles.title(24),
         ),
@@ -216,7 +217,6 @@ class _ImportantNote extends StatelessWidget {
         border: Border.all(color: const Color(0xFFD9EAFD)),
       ),
       child: Row(
-        textDirection: TextDirection.rtl,
         children: [
           const Icon(
             Icons.info_outline_rounded,

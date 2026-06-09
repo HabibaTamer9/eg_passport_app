@@ -119,6 +119,8 @@ class LoginCubit extends Cubit<LoginState> {
         AppData.user.documents = documents
             .map((d) => DocumentModel.fromJson(d))
             .toList();
+        var document = AppData.user.documents?.firstWhere((d)=> d.documentType == "ProfilePhoto");
+        AppData.user.profileImage = document?.fileUrl;
       }else{
         AppData.user.applicationId = null;
         AppData.user.appNumber = null;

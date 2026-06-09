@@ -15,14 +15,17 @@ class MockRequestsRepository implements RequestsRepository {
 
   @override
   Future<List<PassportRequest>> fetchRequests() async {
+    print("fetchRequests");
       try {
         var response = await ApiHelper().getAPI(
           "${Endpoint.my}${Endpoint.applications}",
         );
 
         if (response["success"] != true) {
+          print(response);
           return [];
         }
+        print(response);
 
         final items = response["data"]["items"] as List;
 
